@@ -1,0 +1,49 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 64 64"
+    role="img"
+    aria-label="ExpenseFlow"
+>
+    <defs>
+        <linearGradient
+            id="expenseflow-gradient"
+            x1="8"
+            y1="8"
+            x2="56"
+            y2="56"
+            gradientUnits="userSpaceOnUse"
+        >
+            <stop stop-color="#6366F1"/>
+            <stop offset="1" stop-color="#14B8A6"/>
+        </linearGradient>
+    </defs>
+
+    <rect
+        x="4"
+        y="4"
+        width="56"
+        height="56"
+        rx="16"
+        fill="url(#expenseflow-gradient)"
+    />
+
+    <path
+        d="M17 22.5C17 19.46 19.46 17 22.5 17H43C45.21 17 47 18.79 47 21V25H22.5C19.46 25 17 22.54 17 19.5"
+        fill="none"
+        stroke="white"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+
+    <path
+        d="M17 23V42C17 44.76 19.24 47 22 47H47V25H22C19.24 25 17 27.24 17 30"
+        fill="none"
+        stroke="white"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+
+    <circle cx="40" cy="36" r="2.5" fill="white"/>
+</svg>

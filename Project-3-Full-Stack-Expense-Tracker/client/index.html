@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="ExpenseFlow is a responsive full-stack personal finance and expense tracking application."
+    >
+
+    <title>ExpenseFlow | Personal Finance Dashboard</title>
+
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="app-shell">
+        <!-- Mobile Overlay -->
+        <button
+            class="sidebar-overlay"
+            id="sidebar-overlay"
+            type="button"
+            aria-label="Close navigation"
+            hidden
+        ></button>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a class="brand" href="#" aria-label="ExpenseFlow dashboard">
+                    <span class="brand-icon">
+                        <i data-lucide="wallet-cards"></i>
+                    </span>
+
+                    <span class="brand-text">
+                        Expense<span>Flow</span>
+                    </span>
+                </a>
+
+                <button
+                    class="icon-button sidebar-close"
+                    id="sidebar-close"
+                    type="button"
+                    aria-label="Close navigation"
+                    aria-controls="sidebar"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-navigation" aria-label="Main navigation">
+                <p class="navigation-label">Workspace</p>
+
+                <button
+                    class="navigation-link active"
+                    type="button"
+                    data-page-target="dashboard"
+                >
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </button>
+
+                <button
+                    class="navigation-link"
+                    type="button"
+                    data-page-target="transactions"
+                >
+                    <i data-lucide="arrow-left-right"></i>
+                    <span>Transactions</span>
+                </button>
+
+                <button
+                    class="navigation-link"
+                    type="button"
+                    data-page-target="categories"
+                >
+                    <i data-lucide="tags"></i>
+                    <span>Categories</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-summary">
+                <div class="sidebar-summary-icon">
+                    <i data-lucide="piggy-bank"></i>
+                </div>
+
+                <p>Track smarter</p>
+                <span>Build better financial habits every month.</span>
+            </div>
+
+            <div class="sidebar-footer">
+                <span class="status-indicator"></span>
+
+                <div>
+                    <strong>ExpenseFlow API</strong>
+                    <span>Connected locally</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Application -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-title-group">
+                    <button
+                        class="icon-button mobile-menu-button"
+                        id="mobile-menu-button"
+                        type="button"
+                        aria-label="Open navigation"
+                        aria-controls="sidebar"
+                        aria-expanded="false"
+                    >
+                        <i data-lucide="menu"></i>
+                    </button>
+
+                    <div>
+                        <p class="eyebrow">Personal finance</p>
+                        <h1 id="page-title">Dashboard</h1>
+
+                        <p class="page-subtitle" id="page-subtitle">
+                            Monitor your money and understand where it goes.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <label class="month-control" for="global-month">
+                        <i data-lucide="calendar-days"></i>
+
+                        <span class="visually-hidden">
+                            Select dashboard month
+                        </span>
+
+                        <select
+                            id="global-month"
+                            aria-label="Select dashboard month"
+                        ></select>
+
+                        <i
+                            class="month-control-chevron"
+                            data-lucide="chevron-down"
+                        ></i>
+                    </label>
+
+                    <button
+                        class="primary-button"
+                        id="open-transaction-modal"
+                        type="button"
+                    >
+                        <i data-lucide="plus"></i>
+                        <span>Add Transaction</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <section
+                class="page-section active"
+                id="dashboard-page"
+                data-page="dashboard"
+            >
+                <!-- Summary Cards -->
+                <div class="summary-grid">
+                    <article class="summary-card balance-card">
+                        <div class="summary-card-header">
+                            <span class="summary-icon balance-icon">
+                                <i data-lucide="landmark"></i>
+                            </span>
+
+                            <span class="summary-badge neutral">
+                                This month
+                            </span>
+                        </div>
+
+                        <p>Total Balance</p>
+                        <h2 id="total-balance">$0.00</h2>
+                        <span class="summary-description">
+                            Income minus expenses
+                        </span>
+                    </article>
+
+                    <article class="summary-card">
+                        <div class="summary-card-header">
+                            <span class="summary-icon income-icon">
+                                <i data-lucide="trending-up"></i>
+                            </span>
+
+                            <span class="summary-badge positive">
+                                Income
+                            </span>
+                        </div>
+
+                        <p>Total Income</p>
+                        <h2 id="total-income">$0.00</h2>
+                        <span class="summary-description">
+                            Money received this month
+                        </span>
+                    </article>
+
+                    <article class="summary-card">
+                        <div class="summary-card-header">
+                            <span class="summary-icon expense-icon">
+                                <i data-lucide="trending-down"></i>
+                            </span>
+
+                            <span class="summary-badge negative">
+                                Expenses
+                            </span>
+                        </div>
+
+                        <p>Total Expenses</p>
+                        <h2 id="total-expenses">$0.00</h2>
+                        <span class="summary-description">
+                            Money spent this month
+                        </span>
+                    </article>
+
+                    <article class="summary-card">
+                        <div class="summary-card-header">
+                            <span class="summary-icon savings-icon">
+                                <i data-lucide="piggy-bank"></i>
+                            </span>
+
+                            <span class="summary-badge positive">
+                                Savings
+                            </span>
+                        </div>
+
+                        <p>Savings Rate</p>
+                        <h2 id="savings-rate">0%</h2>
+                        <span class="summary-description">
+                            Percentage of income saved
+                        </span>
+                    </article>
+                </div>
+
+                <!-- Dashboard Charts -->
+                <div class="dashboard-grid">
+                    <article class="content-card monthly-overview-card">
+                        <div class="card-heading">
+                            <div>
+                                <p class="card-eyebrow">Cash flow</p>
+                                <h2>Monthly Overview</h2>
+                                <span>Income and expense activity</span>
+                            </div>
+
+                            <div class="chart-legend">
+                                <span>
+                                    <i class="legend-dot income-dot"></i>
+                                    Income
+                                </span>
+
+                                <span>
+                                    <i class="legend-dot expense-dot"></i>
+                                    Expenses
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="chart-wrapper">
+                            <canvas
+                                id="monthly-chart"
+                                aria-label="Monthly income and expenses chart"
+                            ></canvas>
+                        </div>
+                    </article>
+
+                    <article class="content-card category-chart-card">
+                        <div class="card-heading">
+                            <div>
+                                <p class="card-eyebrow">Distribution</p>
+                                <h2>Spending by Category</h2>
+                                <span>Your largest expense areas</span>
+                            </div>
+                        </div>
+
+                        <div class="category-chart-content">
+                            <div class="donut-wrapper">
+                                <canvas
+                                    id="category-chart"
+                                    aria-label="Expenses by category chart"
+                                ></canvas>
+
+                                <div class="donut-center">
+                                    <span>Total spent</span>
+                                    <strong id="category-chart-total">
+                                        $0.00
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div
+                                class="category-legend"
+                                id="category-chart-legend"
+                            ></div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Recent Transactions -->
+                <article class="content-card recent-transactions-card">
+                    <div class="card-heading">
+                        <div>
+                            <p class="card-eyebrow">Latest activity</p>
+                            <h2>Recent Transactions</h2>
+                            <span>Your most recent income and expenses</span>
+                        </div>
+
+                        <button
+                            class="text-button"
+                            type="button"
+                            data-page-target="transactions"
+                        >
+                            View all
+                            <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div
+                        class="transaction-list"
+                        id="recent-transactions-list"
+                    ></div>
+
+                    <div
+                        class="empty-state"
+                        id="recent-transactions-empty"
+                        hidden
+                    >
+                        <i data-lucide="receipt-text"></i>
+                        <h3>No transactions yet</h3>
+                        <p>Add your first transaction to begin tracking.</p>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Transactions Page -->
+            <section
+                class="page-section"
+                id="transactions-page"
+                data-page="transactions"
+                hidden
+            >
+                <article class="content-card filter-card">
+                    <div class="filter-grid">
+                        <label class="form-field search-field">
+                            <span>Search</span>
+
+                            <div class="input-with-icon">
+                                <i data-lucide="search"></i>
+
+                                <input
+                                    id="transaction-search"
+                                    type="search"
+                                    placeholder="Search title or notes..."
+                                >
+                            </div>
+                        </label>
+
+                        <label class="form-field">
+                            <span>Month</span>
+
+                            <select
+                                id="transaction-month-filter"
+                                aria-label="Filter transactions by month"
+                            ></select>
+                        </label>
+
+                        <label class="form-field">
+                            <span>Type</span>
+
+                            <select id="transaction-type-filter">
+                                <option value="">All types</option>
+                                <option value="income">Income</option>
+                                <option value="expense">Expense</option>
+                            </select>
+                        </label>
+
+                        <label class="form-field">
+                            <span>Category</span>
+
+                            <select id="transaction-category-filter">
+                                <option value="">All categories</option>
+                            </select>
+                        </label>
+
+                        <button
+                            class="secondary-button reset-filter-button"
+                            id="reset-transaction-filters"
+                            type="button"
+                        >
+                            <i data-lucide="rotate-ccw"></i>
+                            Reset
+                        </button>
+                    </div>
+                </article>
+
+                <article class="content-card transactions-card">
+                    <div class="card-heading">
+                        <div>
+                            <p class="card-eyebrow">Financial activity</p>
+                            <h2>All Transactions</h2>
+
+                            <span id="transaction-result-count">
+                                0 transactions
+                            </span>
+                        </div>
+
+                        <button
+                            class="primary-button compact-button"
+                            id="open-transaction-modal-secondary"
+                            type="button"
+                        >
+                            <i data-lucide="plus"></i>
+                            Add Transaction
+                        </button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction</th>
+                                    <th>Category</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th class="amount-column">Amount</th>
+                                    <th class="action-column">Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="transactions-table-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div
+                        class="empty-state"
+                        id="transactions-empty"
+                        hidden
+                    >
+                        <i data-lucide="search-x"></i>
+                        <h3>No transactions found</h3>
+                        <p>Try changing your filters or add a transaction.</p>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Categories Page -->
+            <section
+                class="page-section"
+                id="categories-page"
+                data-page="categories"
+                hidden
+            >
+                <div class="section-toolbar">
+                    <div>
+                        <p class="card-eyebrow">Organization</p>
+                        <h2>Manage Categories</h2>
+                        <p>
+                            Create categories to organize income and expenses.
+                        </p>
+                    </div>
+
+                    <button
+                        class="primary-button"
+                        id="open-category-modal"
+                        type="button"
+                    >
+                        <i data-lucide="plus"></i>
+                        Add Category
+                    </button>
+                </div>
+
+                <div class="category-sections">
+                    <article class="content-card">
+                        <div class="card-heading">
+                            <div>
+                                <p class="card-eyebrow income-text">
+                                    Money received
+                                </p>
+                                <h2>Income Categories</h2>
+                            </div>
+
+                            <span
+                                class="category-count income-count"
+                                id="income-category-count"
+                            >
+                                0
+                            </span>
+                        </div>
+
+                        <div
+                            class="category-grid"
+                            id="income-category-grid"
+                        ></div>
+
+                        <div
+                            class="empty-state small-empty-state"
+                            id="income-category-empty"
+                            hidden
+                        >
+                            <i data-lucide="tags"></i>
+                            <h3>No income categories</h3>
+                        </div>
+                    </article>
+
+                    <article class="content-card">
+                        <div class="card-heading">
+                            <div>
+                                <p class="card-eyebrow expense-text">
+                                    Money spent
+                                </p>
+                                <h2>Expense Categories</h2>
+                            </div>
+
+                            <span
+                                class="category-count expense-count"
+                                id="expense-category-count"
+                            >
+                                0
+                            </span>
+                        </div>
+
+                        <div
+                            class="category-grid"
+                            id="expense-category-grid"
+                        ></div>
+
+                        <div
+                            class="empty-state small-empty-state"
+                            id="expense-category-empty"
+                            hidden
+                        >
+                            <i data-lucide="tags"></i>
+                            <h3>No expense categories</h3>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div
+        class="modal"
+        id="transaction-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="transaction-modal-title"
+        hidden
+    >
+        <div class="modal-backdrop" data-close-modal="transaction"></div>
+
+        <div class="modal-panel">
+            <div class="modal-header">
+                <div>
+                    <p class="card-eyebrow">Financial record</p>
+                    <h2 id="transaction-modal-title">
+                        Add Transaction
+                    </h2>
+                </div>
+
+                <button
+                    class="icon-button"
+                    type="button"
+                    data-close-modal="transaction"
+                    aria-label="Close transaction form"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <form id="transaction-form" novalidate>
+                <input id="transaction-id" type="hidden">
+
+                <div class="form-grid">
+                    <label class="form-field full-width-field">
+                        <span>Title</span>
+
+                        <input
+                            id="transaction-title"
+                            type="text"
+                            maxlength="120"
+                            placeholder="Example: Monthly salary"
+                            required
+                        >
+                    </label>
+
+                    <label class="form-field">
+                        <span>Amount</span>
+
+                        <div class="input-with-icon">
+                            <i data-lucide="circle-dollar-sign"></i>
+
+                            <input
+                                id="transaction-amount"
+                                type="number"
+                                min="0.01"
+                                step="0.01"
+                                placeholder="0.00"
+                                required
+                            >
+                        </div>
+                    </label>
+
+                    <label class="form-field">
+                        <span>Type</span>
+
+                        <select id="transaction-type" required>
+                            <option value="expense">Expense</option>
+                            <option value="income">Income</option>
+                        </select>
+                    </label>
+
+                    <label class="form-field">
+                        <span>Category</span>
+
+                        <select id="transaction-category" required>
+                            <option value="">Select category</option>
+                        </select>
+                    </label>
+
+                    <label class="form-field">
+                        <span>Date</span>
+
+                        <input
+                            id="transaction-date"
+                            type="date"
+                            required
+                        >
+                    </label>
+
+                    <label class="form-field full-width-field">
+                        <span>Notes</span>
+
+                        <textarea
+                            id="transaction-notes"
+                            rows="4"
+                            maxlength="500"
+                            placeholder="Add an optional note..."
+                        ></textarea>
+                    </label>
+                </div>
+
+                <p
+                    class="form-message error-message"
+                    id="transaction-form-error"
+                    role="alert"
+                    hidden
+                ></p>
+
+                <div class="modal-actions">
+                    <button
+                        class="secondary-button"
+                        type="button"
+                        data-close-modal="transaction"
+                    >
+                        Cancel
+                    </button>
+
+                    <button class="primary-button" type="submit">
+                        <i data-lucide="check"></i>
+                        <span id="transaction-submit-label">
+                            Save Transaction
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div
+        class="modal"
+        id="category-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="category-modal-title"
+        hidden
+    >
+        <div class="modal-backdrop" data-close-modal="category"></div>
+
+        <div class="modal-panel small-modal-panel">
+            <div class="modal-header">
+                <div>
+                    <p class="card-eyebrow">Organization</p>
+                    <h2 id="category-modal-title">Add Category</h2>
+                </div>
+
+                <button
+                    class="icon-button"
+                    type="button"
+                    data-close-modal="category"
+                    aria-label="Close category form"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <form id="category-form" novalidate>
+                <input id="category-id" type="hidden">
+
+                <div class="form-grid">
+                    <label class="form-field full-width-field">
+                        <span>Name</span>
+
+                        <input
+                            id="category-name"
+                            type="text"
+                            maxlength="60"
+                            placeholder="Example: Education"
+                            required
+                        >
+                    </label>
+
+                    <label class="form-field">
+                        <span>Type</span>
+
+                        <select id="category-type" required>
+                            <option value="expense">Expense</option>
+                            <option value="income">Income</option>
+                        </select>
+                    </label>
+
+                    <label class="form-field">
+                        <span>Color</span>
+
+                        <input
+                            id="category-color"
+                            type="color"
+                            value="#6366f1"
+                            required
+                        >
+                    </label>
+
+                    <label class="form-field full-width-field">
+                        <span>Icon</span>
+
+                        <select id="category-icon" required>
+                            <option value="tag">Tag</option>
+                            <option value="briefcase-business">
+                                Briefcase
+                            </option>
+                            <option value="laptop">Laptop</option>
+                            <option value="shopping-cart">
+                                Shopping Cart
+                            </option>
+                            <option value="receipt-text">Receipt</option>
+                            <option value="car">Car</option>
+                            <option value="shopping-bag">
+                                Shopping Bag
+                            </option>
+                            <option value="heart-pulse">Health</option>
+                            <option value="gamepad-2">
+                                Entertainment
+                            </option>
+                            <option value="graduation-cap">
+                                Education
+                            </option>
+                        </select>
+                    </label>
+                </div>
+
+                <p
+                    class="form-message error-message"
+                    id="category-form-error"
+                    role="alert"
+                    hidden
+                ></p>
+
+                <div class="modal-actions">
+                    <button
+                        class="secondary-button"
+                        type="button"
+                        data-close-modal="category"
+                    >
+                        Cancel
+                    </button>
+
+                    <button class="primary-button" type="submit">
+                        <i data-lucide="check"></i>
+                        <span id="category-submit-label">
+                            Save Category
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+        class="modal"
+        id="delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-modal-title"
+        hidden
+    >
+        <div class="modal-backdrop" data-close-modal="delete"></div>
+
+        <div class="modal-panel confirmation-panel">
+            <span class="confirmation-icon">
+                <i data-lucide="alert-triangle"></i>
+            </span>
+
+            <h2 id="delete-modal-title">Confirm deletion</h2>
+
+            <p id="delete-modal-message">
+                This action cannot be undone.
+            </p>
+
+            <div class="modal-actions centered-actions">
+                <button
+                    class="secondary-button"
+                    id="cancel-delete-button"
+                    type="button"
+                    data-close-modal="delete"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    class="danger-button"
+                    id="confirm-delete-button"
+                    type="button"
+                >
+                    <i data-lucide="trash-2"></i>
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Messages -->
+    <div
+        class="toast-container"
+        id="toast-container"
+        aria-live="polite"
+        aria-atomic="true"
+    ></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="./script.js"></script>
+</body>
+</html>
