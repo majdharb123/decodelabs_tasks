@@ -1,6 +1,6 @@
 "use strict";
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "https://expenseflow-api-d8tq.onrender.com/api";
 
 async function apiRequest(endpoint, options = {}) {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
