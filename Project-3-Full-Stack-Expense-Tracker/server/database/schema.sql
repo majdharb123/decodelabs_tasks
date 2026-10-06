@@ -1,9 +1,9 @@
-CREATE TABLE IF NOT EXIST categories (
+CREATE TABLE IF NOT EXISTS categories (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     type VARCHAR(10) NOT NULL
         CHECK (type IN ('income','expense')),
-    color VARCHAR(7) NOT NULL DEFAULT '#3B872F6'
+    color VARCHAR(7) NOT NULL DEFAULT '#3B82F6'
         CHECK (color ~ '^#[0-9A-Fa-f]{6}$'),
     icon VARCHAR(50) NOT NULL DEFAULT 'circle-dollar-sign',
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXIST categories (
         UNIQUE(name,type)
 );
 
-CREATE TABLE IF NOT EXIST transactions (
+CREATE TABLE IF NOT EXISTS transactions (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(100) NOT NULL
         CHECK (CHAR_LENGTH(TRIM(title)) > 0),
