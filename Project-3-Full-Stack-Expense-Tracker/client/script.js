@@ -1,202 +1,70 @@
 "use strict";
 
-/* =========================================================
-   ExpenseFlow - Temporary Frontend Data
+const API_BASE_URL = "http://localhost:5000/api";
 
-   These values are used only to build and test the interface.
-   They will be replaced by API data during the next phase.
-========================================================= */
+async function apiRequest(endpoint, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+  });
 
-const mockCategories = [
-    {
-        id: "1",
-        name: "Salary",
-        type: "income",
-        color: "#16A34A",
-        icon: "briefcase-business"
-    },
-    {
-        id: "2",
-        name: "Freelance",
-        type: "income",
-        color: "#10B981",
-        icon: "laptop"
-    },
-    {
-        id: "3",
-        name: "Food",
-        type: "expense",
-        color: "#EF4444",
-        icon: "shopping-cart"
-    },
-    {
-        id: "4",
-        name: "Bills",
-        type: "expense",
-        color: "#3B82F6",
-        icon: "receipt-text"
-    },
-    {
-        id: "5",
-        name: "Transport",
-        type: "expense",
-        color: "#F59E0B",
-        icon: "car"
-    },
-    {
-        id: "6",
-        name: "Shopping",
-        type: "expense",
-        color: "#8B5CF6",
-        icon: "shopping-bag"
-    },
-    {
-        id: "7",
-        name: "Health",
-        type: "expense",
-        color: "#EC4899",
-        icon: "heart-pulse"
-    },
-    {
-        id: "8",
-        name: "Entertainment",
-        type: "expense",
-        color: "#6366F1",
-        icon: "gamepad-2"
-    }
-];
+  const result = await response.json();
 
-const mockTransactions = [
-    {
-        id: "1",
-        title: "October Salary",
-        amount: 3200,
-        type: "income",
-        category_id: "1",
-        transaction_date: "2026-10-03",
-        notes: "Monthly salary payment"
-    },
-    {
-        id: "2",
-        title: "Weekly Groceries",
-        amount: 145.75,
-        type: "expense",
-        category_id: "3",
-        transaction_date: "2026-10-04",
-        notes: "Food and household supplies"
-    },
-    {
-        id: "3",
-        title: "Electricity Bill",
-        amount: 88.4,
-        type: "expense",
-        category_id: "4",
-        transaction_date: "2026-10-06",
-        notes: "Monthly electricity payment"
-    },
-    {
-        id: "4",
-        title: "Freelance Website",
-        amount: 480,
-        type: "income",
-        category_id: "2",
-        transaction_date: "2026-10-10",
-        notes: "Landing page development"
-    },
-    {
-        id: "5",
-        title: "Fuel",
-        amount: 62,
-        type: "expense",
-        category_id: "5",
-        transaction_date: "2026-10-12",
-        notes: "Weekly fuel expense"
-    },
-    {
-        id: "6",
-        title: "New Headphones",
-        amount: 190,
-        type: "expense",
-        category_id: "6",
-        transaction_date: "2026-10-15",
-        notes: "Wireless headphones"
-    },
-    {
-        id: "7",
-        title: "Pharmacy",
-        amount: 34.5,
-        type: "expense",
-        category_id: "7",
-        transaction_date: "2026-10-18",
-        notes: "Medicine and vitamins"
-    },
-    {
-        id: "8",
-        title: "Movie Night",
-        amount: 48,
-        type: "expense",
-        category_id: "8",
-        transaction_date: "2026-10-22",
-        notes: "Cinema tickets and snacks"
-    },
-    {
-        id: "9",
-        title: "Internet Bill",
-        amount: 65,
-        type: "expense",
-        category_id: "4",
-        transaction_date: "2026-10-26",
-        notes: "Monthly internet subscription"
-    }
-];
+  if (!response.ok || result.status === "error") {
+    throw new Error(
+      result.message || "Something went wrong while contacting the server.",
+    );
+  }
+
+  return result;
+}
 
 const state = {
-    activePage: "dashboard",
-    selectedMonth: "2026-10",
-    transactions: mockTransactions.map((transaction) => ({
-        ...transaction
-    })),
-    categories: mockCategories.map((category) => ({
-        ...category
-    })),
-    editingTransactionId: null,
-    editingCategoryId: null,
-    deleteTarget: null,
-    monthlyChart: null,
-    categoryChart: null
+  activePage: "dashboard",
+  selectedMonth: "2026-10",
+  transactions: [],
+  categories: [],
+  editingTransactionId: null,
+  editingCategoryId: null,
+  deleteTarget: null,
+  monthlyChart: null,
+  categoryChart: null,
 };
 
 const pageInformation = {
-    dashboard: {
-        title: "Dashboard",
-        subtitle: "Monitor your money and understand where it goes."
-    },
-    transactions: {
-        title: "Transactions",
-        subtitle: "Search, filter and manage your financial activity."
-    },
-    categories: {
-        title: "Categories",
-        subtitle: "Organize your income and expenses with clear categories."
-    }
+  dashboard: {
+    title: "Dashboard",
+    subtitle: "Monitor your money and understand where it goes.",
+  },
+  transactions: {
+    title: "Transactions",
+    subtitle: "Search, filter and manage your financial activity.",
+  },
+  categories: {
+    title: "Categories",
+    subtitle: "Organize your income and expenses with clear categories.",
+  },
 };
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
 });
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric"
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
 });
 
 const monthFormatter = new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC"
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
 });
 
 /* =========================================================
@@ -204,145 +72,128 @@ const monthFormatter = new Intl.DateTimeFormat("en-US", {
 ========================================================= */
 
 function getElement(selector) {
-    return document.querySelector(selector);
+  return document.querySelector(selector);
 }
 
 function getElements(selector) {
-    return [...document.querySelectorAll(selector)];
+  return [...document.querySelectorAll(selector)];
 }
 
 function escapeHTML(value = "") {
-    return String(value).replace(/[&<>"']/g, (character) => {
-        const entities = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            "\"": "&quot;",
-            "'": "&#039;"
-        };
+  return String(value).replace(/[&<>"']/g, (character) => {
+    const entities = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;",
+    };
 
-        return entities[character];
-    });
+    return entities[character];
+  });
 }
 
 function formatCurrency(value) {
-    return currencyFormatter.format(Number(value) || 0);
+  return currencyFormatter.format(Number(value) || 0);
 }
 
 function formatTransactionAmount(transaction) {
-    const prefix = transaction.type === "income" ? "+" : "-";
+  const prefix = transaction.type === "income" ? "+" : "-";
 
-    return `${prefix}${formatCurrency(transaction.amount)}`;
+  return `${prefix}${formatCurrency(transaction.amount)}`;
 }
 
 function formatDate(value) {
-    if (!value) {
-        return "No date";
-    }
+  if (!value) {
+    return "No date";
+  }
 
-    return dateFormatter.format(new Date(`${value}T00:00:00`));
+  return dateFormatter.format(new Date(`${value}T00:00:00`));
 }
 
 function formatMonth(value) {
-    const [year, month] = value.split("-").map(Number);
+  const [year, month] = value.split("-").map(Number);
 
-    return monthFormatter.format(
-        new Date(Date.UTC(year, month - 1, 1))
-    );
+  return monthFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
 }
 
 function buildMonthOptions() {
-    const selectedYear = Number(state.selectedMonth.slice(0, 4));
-    const options = [];
+  const selectedYear = Number(state.selectedMonth.slice(0, 4));
+  const options = [];
 
-    for (
-        let year = selectedYear + 3;
-        year >= selectedYear - 3;
-        year -= 1
-    ) {
-        for (let month = 12; month >= 1; month -= 1) {
-            const value = `${year}-${String(month).padStart(2, "0")}`;
+  for (let year = selectedYear + 3; year >= selectedYear - 3; year -= 1) {
+    for (let month = 12; month >= 1; month -= 1) {
+      const value = `${year}-${String(month).padStart(2, "0")}`;
 
-            options.push(`
+      options.push(`
                 <option value="${value}">
                     ${formatMonth(value)}
                 </option>
             `);
-        }
     }
+  }
 
-    return options.join("");
+  return options.join("");
 }
 
 function populateMonthSelectors() {
-    const monthOptions = buildMonthOptions();
-    const globalMonth = getElement("#global-month");
-    const transactionMonth = getElement(
-        "#transaction-month-filter"
-    );
+  const monthOptions = buildMonthOptions();
+  const globalMonth = getElement("#global-month");
+  const transactionMonth = getElement("#transaction-month-filter");
 
-    globalMonth.innerHTML = monthOptions;
-    transactionMonth.innerHTML = `
+  globalMonth.innerHTML = monthOptions;
+  transactionMonth.innerHTML = `
         <option value="">All months</option>
         ${monthOptions}
     `;
 
-    globalMonth.value = state.selectedMonth;
-    transactionMonth.value = state.selectedMonth;
+  globalMonth.value = state.selectedMonth;
+  transactionMonth.value = state.selectedMonth;
 }
 
 function getCategory(categoryId) {
-    return state.categories.find(
-        (category) => String(category.id) === String(categoryId)
-    );
+  return state.categories.find(
+    (category) => String(category.id) === String(categoryId),
+  );
 }
 
 function getMonthTransactions(month = state.selectedMonth) {
-    return state.transactions.filter((transaction) => {
-        return transaction.transaction_date.startsWith(month);
-    });
+  return state.transactions.filter((transaction) => {
+    return transaction.transaction_date.startsWith(month);
+  });
 }
 
 function sortTransactions(transactions) {
-    return [...transactions].sort((first, second) => {
-        const dateDifference =
-            new Date(second.transaction_date) -
-            new Date(first.transaction_date);
+  return [...transactions].sort((first, second) => {
+    const dateDifference =
+      new Date(second.transaction_date) - new Date(first.transaction_date);
 
-        if (dateDifference !== 0) {
-            return dateDifference;
-        }
+    if (dateDifference !== 0) {
+      return dateDifference;
+    }
 
-        return Number(second.id) - Number(first.id);
-    });
+    return Number(second.id) - Number(first.id);
+  });
 }
 
 function hexToRGBA(hexColor, opacity) {
-    const normalizedColor = hexColor.replace("#", "");
+  const normalizedColor = hexColor.replace("#", "");
 
-    if (normalizedColor.length !== 6) {
-        return `rgba(99, 102, 241, ${opacity})`;
-    }
+  if (normalizedColor.length !== 6) {
+    return `rgba(99, 102, 241, ${opacity})`;
+  }
 
-    const red = Number.parseInt(normalizedColor.slice(0, 2), 16);
-    const green = Number.parseInt(normalizedColor.slice(2, 4), 16);
-    const blue = Number.parseInt(normalizedColor.slice(4, 6), 16);
+  const red = Number.parseInt(normalizedColor.slice(0, 2), 16);
+  const green = Number.parseInt(normalizedColor.slice(2, 4), 16);
+  const blue = Number.parseInt(normalizedColor.slice(4, 6), 16);
 
-    return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
+  return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
 }
 
 function refreshIcons() {
-    if (window.lucide) {
-        window.lucide.createIcons();
-    }
-}
-
-function createNextId(items) {
-    const largestId = items.reduce((largest, item) => {
-        return Math.max(largest, Number(item.id) || 0);
-    }, 0);
-
-    return String(largestId + 1);
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 }
 
 /* =========================================================
@@ -350,75 +201,76 @@ function createNextId(items) {
 ========================================================= */
 
 function navigateTo(pageName) {
-    if (!pageInformation[pageName]) {
-        return;
-    }
+  if (!pageInformation[pageName]) {
+    return;
+  }
 
-    state.activePage = pageName;
+  if (window.location.hash !== `#${pageName}`) {
+    window.location.hash = pageName;
+  }
 
-    getElements(".page-section").forEach((section) => {
-        const isActive = section.dataset.page === pageName;
+  state.activePage = pageName;
 
-        section.classList.toggle("active", isActive);
-        section.hidden = !isActive;
-    });
+  getElements(".page-section").forEach((section) => {
+    const isActive = section.dataset.page === pageName;
 
-    getElements(".navigation-link").forEach((button) => {
-        button.classList.toggle(
-            "active",
-            button.dataset.pageTarget === pageName
-        );
-    });
+    section.classList.toggle("active", isActive);
+    section.hidden = !isActive;
+  });
 
-    const information = pageInformation[pageName];
+  getElements(".navigation-link").forEach((button) => {
+    button.classList.toggle("active", button.dataset.pageTarget === pageName);
+  });
 
-    getElement("#page-title").textContent = information.title;
-    getElement("#page-subtitle").textContent = information.subtitle;
+  const information = pageInformation[pageName];
 
-    closeSidebar();
+  getElement("#page-title").textContent = information.title;
+  getElement("#page-subtitle").textContent = information.subtitle;
 
-    if (pageName === "dashboard") {
-        renderDashboard();
-    }
+  closeSidebar();
 
-    if (pageName === "transactions") {
-        renderTransactionsPage();
-    }
+  if (pageName === "dashboard") {
+    renderDashboard();
+  }
 
-    if (pageName === "categories") {
-        renderCategoriesPage();
-    }
+  if (pageName === "transactions") {
+    renderTransactionsPage();
+  }
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+  if (pageName === "categories") {
+    renderCategoriesPage();
+  }
 
-    refreshIcons();
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+
+  refreshIcons();
 }
 
 function openSidebar() {
-    const sidebar = getElement("#sidebar");
-    const menuButton = getElement("#mobile-menu-button");
+  const sidebar = getElement("#sidebar");
+  const menuButton = getElement("#mobile-menu-button");
 
-    sidebar.classList.add("open");
-    getElement("#sidebar-overlay").hidden = false;
-    document.body.classList.add("sidebar-open");
-    menuButton.setAttribute("aria-expanded", "true");
+  sidebar.classList.add("open");
+  getElement("#sidebar-overlay").hidden = false;
+  document.body.classList.add("sidebar-open");
+  menuButton.setAttribute("aria-expanded", "true");
 
-    window.requestAnimationFrame(() => {
-        getElement("#sidebar-close").focus();
-    });
+  window.requestAnimationFrame(() => {
+    getElement("#sidebar-close").focus();
+  });
 }
 
 function closeSidebar() {
-    const sidebar = getElement("#sidebar");
-    const menuButton = getElement("#mobile-menu-button");
+  const sidebar = getElement("#sidebar");
+  const menuButton = getElement("#mobile-menu-button");
 
-    sidebar.classList.remove("open");
-    getElement("#sidebar-overlay").hidden = true;
-    document.body.classList.remove("sidebar-open");
-    menuButton.setAttribute("aria-expanded", "false");
+  sidebar.classList.remove("open");
+  getElement("#sidebar-overlay").hidden = true;
+  document.body.classList.remove("sidebar-open");
+  menuButton.setAttribute("aria-expanded", "false");
 }
 
 /* =========================================================
@@ -426,52 +278,47 @@ function closeSidebar() {
 ========================================================= */
 
 function calculateSummary(transactions) {
-    const income = transactions
-        .filter((transaction) => transaction.type === "income")
-        .reduce((total, transaction) => {
-            return total + Number(transaction.amount);
-        }, 0);
+  const income = transactions
+    .filter((transaction) => transaction.type === "income")
+    .reduce((total, transaction) => {
+      return total + Number(transaction.amount);
+    }, 0);
 
-    const expenses = transactions
-        .filter((transaction) => transaction.type === "expense")
-        .reduce((total, transaction) => {
-            return total + Number(transaction.amount);
-        }, 0);
+  const expenses = transactions
+    .filter((transaction) => transaction.type === "expense")
+    .reduce((total, transaction) => {
+      return total + Number(transaction.amount);
+    }, 0);
 
-    const balance = income - expenses;
-    const savingsRate = income > 0
-        ? (balance / income) * 100
-        : 0;
+  const balance = income - expenses;
+  const savingsRate = income > 0 ? (balance / income) * 100 : 0;
 
-    return {
-        income,
-        expenses,
-        balance,
-        savingsRate
-    };
+  return {
+    income,
+    expenses,
+    balance,
+    savingsRate,
+  };
 }
 
 function renderDashboard() {
-    const monthTransactions = getMonthTransactions();
-    const summary = calculateSummary(monthTransactions);
+  const monthTransactions = getMonthTransactions();
+  const summary = calculateSummary(monthTransactions);
 
-    getElement("#total-balance").textContent =
-        formatCurrency(summary.balance);
+  getElement("#total-balance").textContent = formatCurrency(summary.balance);
 
-    getElement("#total-income").textContent =
-        formatCurrency(summary.income);
+  getElement("#total-income").textContent = formatCurrency(summary.income);
 
-    getElement("#total-expenses").textContent =
-        formatCurrency(summary.expenses);
+  getElement("#total-expenses").textContent = formatCurrency(summary.expenses);
 
-    getElement("#savings-rate").textContent =
-        `${summary.savingsRate.toFixed(1)}%`;
+  getElement("#savings-rate").textContent =
+    `${summary.savingsRate.toFixed(1)}%`;
 
-    renderRecentTransactions(monthTransactions);
-    renderMonthlyChart(monthTransactions);
-    renderCategoryChart(monthTransactions);
+  renderRecentTransactions(monthTransactions);
+  renderMonthlyChart(monthTransactions);
+  renderCategoryChart(monthTransactions);
 
-    refreshIcons();
+  refreshIcons();
 }
 
 /* =========================================================
@@ -479,10 +326,10 @@ function renderDashboard() {
 ========================================================= */
 
 function createTransactionIcon(category) {
-    const categoryColor = category?.color || "#6366F1";
-    const categoryIcon = category?.icon || "tag";
+  const categoryColor = category?.color || "#6366F1";
+  const categoryIcon = category?.icon || "tag";
 
-    return `
+  return `
         <span
             class="transaction-icon"
             style="
@@ -497,26 +344,25 @@ function createTransactionIcon(category) {
 }
 
 function renderRecentTransactions(transactions) {
-    const list = getElement("#recent-transactions-list");
-    const emptyState = getElement("#recent-transactions-empty");
+  const list = getElement("#recent-transactions-list");
+  const emptyState = getElement("#recent-transactions-empty");
 
-    const recentTransactions = sortTransactions(transactions).slice(0, 5);
+  const recentTransactions = sortTransactions(transactions).slice(0, 5);
 
-    if (recentTransactions.length === 0) {
-        list.innerHTML = "";
-        emptyState.hidden = false;
-        return;
-    }
+  if (recentTransactions.length === 0) {
+    list.innerHTML = "";
+    emptyState.hidden = false;
+    return;
+  }
 
-    emptyState.hidden = true;
+  emptyState.hidden = true;
 
-    list.innerHTML = recentTransactions
-        .map((transaction) => {
-            const category = getCategory(transaction.category_id);
-            const amountClass =
-                transaction.type === "income" ? "income" : "expense";
+  list.innerHTML = recentTransactions
+    .map((transaction) => {
+      const category = getCategory(transaction.category_id);
+      const amountClass = transaction.type === "income" ? "income" : "expense";
 
-            return `
+      return `
                 <article class="transaction-item">
                     ${createTransactionIcon(category)}
 
@@ -532,9 +378,7 @@ function renderRecentTransactions(transactions) {
 
                     <time
                         class="transaction-date"
-                        datetime="${escapeHTML(
-                            transaction.transaction_date
-                        )}"
+                        datetime="${escapeHTML(transaction.transaction_date)}"
                     >
                         ${formatDate(transaction.transaction_date)}
                     </time>
@@ -546,8 +390,8 @@ function renderRecentTransactions(transactions) {
                     </span>
                 </article>
             `;
-        })
-        .join("");
+    })
+    .join("");
 }
 
 /* =========================================================
@@ -555,252 +399,239 @@ function renderRecentTransactions(transactions) {
 ========================================================= */
 
 function renderMonthlyChart(transactions) {
-    if (!window.Chart) {
-        return;
+  if (!window.Chart) {
+    return;
+  }
+
+  const weeklyIncome = [0, 0, 0, 0, 0];
+  const weeklyExpenses = [0, 0, 0, 0, 0];
+
+  transactions.forEach((transaction) => {
+    const transactionDay = Number(transaction.transaction_date.slice(-2));
+
+    const weekIndex = Math.min(Math.floor((transactionDay - 1) / 7), 4);
+
+    if (transaction.type === "income") {
+      weeklyIncome[weekIndex] += Number(transaction.amount);
+    } else {
+      weeklyExpenses[weekIndex] += Number(transaction.amount);
     }
+  });
 
-    const weeklyIncome = [0, 0, 0, 0, 0];
-    const weeklyExpenses = [0, 0, 0, 0, 0];
+  if (state.monthlyChart) {
+    state.monthlyChart.destroy();
+  }
 
-    transactions.forEach((transaction) => {
-        const transactionDay = Number(
-            transaction.transaction_date.slice(-2)
-        );
+  const context = getElement("#monthly-chart").getContext("2d");
 
-        const weekIndex = Math.min(
-            Math.floor((transactionDay - 1) / 7),
-            4
-        );
-
-        if (transaction.type === "income") {
-            weeklyIncome[weekIndex] += Number(transaction.amount);
-        } else {
-            weeklyExpenses[weekIndex] += Number(transaction.amount);
-        }
-    });
-
-    if (state.monthlyChart) {
-        state.monthlyChart.destroy();
-    }
-
-    const context = getElement("#monthly-chart").getContext("2d");
-
-    state.monthlyChart = new Chart(context, {
-        type: "line",
-        data: {
-            labels: [
-                "Week 1",
-                "Week 2",
-                "Week 3",
-                "Week 4",
-                "Week 5"
-            ],
-            datasets: [
-                {
-                    label: "Income",
-                    data: weeklyIncome,
-                    borderColor: "#14B8A6",
-                    backgroundColor: "rgba(20, 184, 166, 0.10)",
-                    fill: true,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: "#14B8A6",
-                    tension: 0.38
-                },
-                {
-                    label: "Expenses",
-                    data: weeklyExpenses,
-                    borderColor: "#6366F1",
-                    backgroundColor: "rgba(99, 102, 241, 0.08)",
-                    fill: true,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: "#6366F1",
-                    tension: 0.38
-                }
-            ]
+  state.monthlyChart = new Chart(context, {
+    type: "line",
+    data: {
+      labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
+      datasets: [
+        {
+          label: "Income",
+          data: weeklyIncome,
+          borderColor: "#14B8A6",
+          backgroundColor: "rgba(20, 184, 166, 0.10)",
+          fill: true,
+          borderWidth: 3,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: "#14B8A6",
+          tension: 0.38,
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                intersect: false,
-                mode: "index"
+        {
+          label: "Expenses",
+          data: weeklyExpenses,
+          borderColor: "#6366F1",
+          backgroundColor: "rgba(99, 102, 241, 0.08)",
+          fill: true,
+          borderWidth: 3,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: "#6366F1",
+          tension: 0.38,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        intersect: false,
+        mode: "index",
+      },
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          padding: 12,
+          displayColors: true,
+          callbacks: {
+            label(contextValue) {
+              return `${contextValue.dataset.label}: ${formatCurrency(
+                contextValue.raw,
+              )}`;
             },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    padding: 12,
-                    displayColors: true,
-                    callbacks: {
-                        label(contextValue) {
-                            return `${contextValue.dataset.label}: ${
-                                formatCurrency(contextValue.raw)
-                            }`;
-                        }
-                    }
-                }
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false,
+          },
+          border: {
+            display: false,
+          },
+          ticks: {
+            color: "#94A3B8",
+            font: {
+              size: 11,
             },
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    border: {
-                        display: false
-                    },
-                    ticks: {
-                        color: "#94A3B8",
-                        font: {
-                            size: 11
-                        }
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    border: {
-                        display: false
-                    },
-                    grid: {
-                        color: "rgba(226, 232, 240, 0.75)"
-                    },
-                    ticks: {
-                        color: "#94A3B8",
-                        font: {
-                            size: 10
-                        },
-                        callback(value) {
-                            return `$${value}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
+          },
+        },
+        y: {
+          beginAtZero: true,
+          border: {
+            display: false,
+          },
+          grid: {
+            color: "rgba(226, 232, 240, 0.75)",
+          },
+          ticks: {
+            color: "#94A3B8",
+            font: {
+              size: 10,
+            },
+            callback(value) {
+              return `$${value}`;
+            },
+          },
+        },
+      },
+    },
+  });
 }
 
 function renderCategoryChart(transactions) {
-    if (!window.Chart) {
-        return;
-    }
+  if (!window.Chart) {
+    return;
+  }
 
-    const expenseTransactions = transactions.filter(
-        (transaction) => transaction.type === "expense"
+  const expenseTransactions = transactions.filter(
+    (transaction) => transaction.type === "expense",
+  );
+
+  const categoryTotals = new Map();
+
+  expenseTransactions.forEach((transaction) => {
+    const categoryId = String(transaction.category_id);
+
+    categoryTotals.set(
+      categoryId,
+      (categoryTotals.get(categoryId) || 0) + Number(transaction.amount),
     );
+  });
 
-    const categoryTotals = new Map();
+  const chartCategories = [...categoryTotals.entries()]
+    .map(([categoryId, amount]) => ({
+      category: getCategory(categoryId),
+      amount,
+    }))
+    .filter((item) => item.category)
+    .sort((first, second) => second.amount - first.amount);
 
-    expenseTransactions.forEach((transaction) => {
-        const categoryId = String(transaction.category_id);
+  const totalExpenses = chartCategories.reduce(
+    (total, item) => total + item.amount,
+    0,
+  );
 
-        categoryTotals.set(
-            categoryId,
-            (categoryTotals.get(categoryId) || 0) +
-                Number(transaction.amount)
-        );
-    });
+  getElement("#category-chart-total").textContent =
+    formatCurrency(totalExpenses);
 
-    const chartCategories = [...categoryTotals.entries()]
-        .map(([categoryId, amount]) => ({
-            category: getCategory(categoryId),
-            amount
-        }))
-        .filter((item) => item.category)
-        .sort((first, second) => second.amount - first.amount);
+  if (state.categoryChart) {
+    state.categoryChart.destroy();
+  }
 
-    const totalExpenses = chartCategories.reduce(
-        (total, item) => total + item.amount,
-        0
-    );
+  const hasData = chartCategories.length > 0;
 
-    getElement("#category-chart-total").textContent =
-        formatCurrency(totalExpenses);
+  const chartLabels = hasData
+    ? chartCategories.map((item) => item.category.name)
+    : ["No expenses"];
 
-    if (state.categoryChart) {
-        state.categoryChart.destroy();
-    }
+  const chartValues = hasData
+    ? chartCategories.map((item) => item.amount)
+    : [1];
 
-    const hasData = chartCategories.length > 0;
+  const chartColors = hasData
+    ? chartCategories.map((item) => item.category.color)
+    : ["#E2E8F0"];
 
-    const chartLabels = hasData
-        ? chartCategories.map((item) => item.category.name)
-        : ["No expenses"];
+  const context = getElement("#category-chart").getContext("2d");
 
-    const chartValues = hasData
-        ? chartCategories.map((item) => item.amount)
-        : [1];
-
-    const chartColors = hasData
-        ? chartCategories.map((item) => item.category.color)
-        : ["#E2E8F0"];
-
-    const context = getElement("#category-chart").getContext("2d");
-
-    state.categoryChart = new Chart(context, {
-        type: "doughnut",
-        data: {
-            labels: chartLabels,
-            datasets: [
-                {
-                    data: chartValues,
-                    backgroundColor: chartColors,
-                    borderColor: "#FFFFFF",
-                    borderWidth: 4,
-                    hoverOffset: 5
-                }
-            ]
+  state.categoryChart = new Chart(context, {
+    type: "doughnut",
+    data: {
+      labels: chartLabels,
+      datasets: [
+        {
+          data: chartValues,
+          backgroundColor: chartColors,
+          borderColor: "#FFFFFF",
+          borderWidth: 4,
+          hoverOffset: 5,
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: "74%",
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    enabled: hasData,
-                    padding: 11,
-                    callbacks: {
-                        label(contextValue) {
-                            return `${contextValue.label}: ${
-                                formatCurrency(contextValue.raw)
-                            }`;
-                        }
-                    }
-                }
-            }
-        }
-    });
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "74%",
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          enabled: hasData,
+          padding: 11,
+          callbacks: {
+            label(contextValue) {
+              return `${contextValue.label}: ${formatCurrency(
+                contextValue.raw,
+              )}`;
+            },
+          },
+        },
+      },
+    },
+  });
 
-    renderCategoryLegend(chartCategories, totalExpenses);
+  renderCategoryLegend(chartCategories, totalExpenses);
 }
 
 function renderCategoryLegend(chartCategories, totalExpenses) {
-    const legend = getElement("#category-chart-legend");
+  const legend = getElement("#category-chart-legend");
 
-    if (chartCategories.length === 0) {
-        legend.innerHTML = `
+  if (chartCategories.length === 0) {
+    legend.innerHTML = `
             <div class="empty-state small-empty-state">
                 <p>No expense data for this month.</p>
             </div>
         `;
 
-        return;
-    }
+    return;
+  }
 
-    legend.innerHTML = chartCategories
-        .slice(0, 5)
-        .map((item) => {
-            const percentage = totalExpenses > 0
-                ? (item.amount / totalExpenses) * 100
-                : 0;
+  legend.innerHTML = chartCategories
+    .slice(0, 5)
+    .map((item) => {
+      const percentage =
+        totalExpenses > 0 ? (item.amount / totalExpenses) * 100 : 0;
 
-            return `
+      return `
                 <div class="category-legend-item">
                     <span
                         class="category-legend-color"
@@ -819,8 +650,8 @@ function renderCategoryLegend(chartCategories, totalExpenses) {
                     </span>
                 </div>
             `;
-        })
-        .join("");
+    })
+    .join("");
 }
 
 /* =========================================================
@@ -828,59 +659,59 @@ function renderCategoryLegend(chartCategories, totalExpenses) {
 ========================================================= */
 
 function populateCategoryFilter() {
-    const filter = getElement("#transaction-category-filter");
-    const previousValue = filter.value;
+  const filter = getElement("#transaction-category-filter");
+  const previousValue = filter.value;
 
-    filter.innerHTML = `
+  filter.innerHTML = `
         <option value="">All categories</option>
         ${state.categories
-            .map((category) => {
-                return `
+          .map((category) => {
+            return `
                     <option value="${escapeHTML(category.id)}">
                         ${escapeHTML(category.name)}
                     </option>
                 `;
-            })
-            .join("")}
+          })
+          .join("")}
     `;
 
-    const previousCategoryStillExists = state.categories.some(
-        (category) => category.id === previousValue
-    );
+  const previousCategoryStillExists = state.categories.some(
+    (category) => category.id === previousValue,
+  );
 
-    if (previousCategoryStillExists) {
-        filter.value = previousValue;
-    }
+  if (previousCategoryStillExists) {
+    filter.value = previousValue;
+  }
 }
 
 function populateTransactionCategorySelect(selectedValue = "") {
-    const select = getElement("#transaction-category");
-    const selectedType = getElement("#transaction-type").value;
+  const select = getElement("#transaction-category");
+  const selectedType = getElement("#transaction-type").value;
 
-    const matchingCategories = state.categories.filter(
-        (category) => category.type === selectedType
-    );
+  const matchingCategories = state.categories.filter(
+    (category) => category.type === selectedType,
+  );
 
-    select.innerHTML = `
+  select.innerHTML = `
         <option value="">Select category</option>
         ${matchingCategories
-            .map((category) => {
-                return `
+          .map((category) => {
+            return `
                     <option value="${escapeHTML(category.id)}">
                         ${escapeHTML(category.name)}
                     </option>
                 `;
-            })
-            .join("")}
+          })
+          .join("")}
     `;
 
-    const selectedCategoryIsValid = matchingCategories.some(
-        (category) => category.id === String(selectedValue)
-    );
+  const selectedCategoryIsValid = matchingCategories.some(
+    (category) => category.id === String(selectedValue),
+  );
 
-    if (selectedCategoryIsValid) {
-        select.value = String(selectedValue);
-    }
+  if (selectedCategoryIsValid) {
+    select.value = String(selectedValue);
+  }
 }
 
 /* =========================================================
@@ -888,88 +719,67 @@ function populateTransactionCategorySelect(selectedValue = "") {
 ========================================================= */
 
 function getFilteredTransactions() {
-    const searchTerm = getElement("#transaction-search")
-        .value
-        .trim()
-        .toLowerCase();
+  const searchTerm = getElement("#transaction-search")
+    .value.trim()
+    .toLowerCase();
 
-    const selectedMonth =
-        getElement("#transaction-month-filter").value;
+  const selectedMonth = getElement("#transaction-month-filter").value;
 
-    const selectedType =
-        getElement("#transaction-type-filter").value;
+  const selectedType = getElement("#transaction-type-filter").value;
 
-    const selectedCategory =
-        getElement("#transaction-category-filter").value;
+  const selectedCategory = getElement("#transaction-category-filter").value;
 
-    return sortTransactions(
-        state.transactions.filter((transaction) => {
-            const matchesMonth =
-                !selectedMonth ||
-                transaction.transaction_date.startsWith(
-                    selectedMonth
-                );
+  return sortTransactions(
+    state.transactions.filter((transaction) => {
+      const matchesMonth =
+        !selectedMonth ||
+        transaction.transaction_date.startsWith(selectedMonth);
 
-            const matchesType =
-                !selectedType ||
-                transaction.type === selectedType;
+      const matchesType = !selectedType || transaction.type === selectedType;
 
-            const matchesCategory =
-                !selectedCategory ||
-                String(transaction.category_id) ===
-                    String(selectedCategory);
+      const matchesCategory =
+        !selectedCategory ||
+        String(transaction.category_id) === String(selectedCategory);
 
-            const searchableText = `
+      const searchableText = `
                 ${transaction.title}
                 ${transaction.notes || ""}
             `.toLowerCase();
 
-            const matchesSearch =
-                !searchTerm ||
-                searchableText.includes(searchTerm);
+      const matchesSearch = !searchTerm || searchableText.includes(searchTerm);
 
-            return (
-                matchesMonth &&
-                matchesType &&
-                matchesCategory &&
-                matchesSearch
-            );
-        })
-    );
+      return matchesMonth && matchesType && matchesCategory && matchesSearch;
+    }),
+  );
 }
 
 function renderTransactionsPage() {
-    const transactions = getFilteredTransactions();
-    const tableBody = getElement("#transactions-table-body");
-    const emptyState = getElement("#transactions-empty");
-    const resultCount = getElement("#transaction-result-count");
+  const transactions = getFilteredTransactions();
+  const tableBody = getElement("#transactions-table-body");
+  const emptyState = getElement("#transactions-empty");
+  const resultCount = getElement("#transaction-result-count");
 
-    resultCount.textContent = `${transactions.length} ${
-        transactions.length === 1
-            ? "transaction"
-            : "transactions"
-    }`;
+  resultCount.textContent = `${transactions.length} ${
+    transactions.length === 1 ? "transaction" : "transactions"
+  }`;
 
-    if (transactions.length === 0) {
-        tableBody.innerHTML = "";
-        emptyState.hidden = false;
-        refreshIcons();
-        return;
-    }
+  if (transactions.length === 0) {
+    tableBody.innerHTML = "";
+    emptyState.hidden = false;
+    refreshIcons();
+    return;
+  }
 
-    emptyState.hidden = true;
+  emptyState.hidden = true;
 
-    tableBody.innerHTML = transactions
-        .map((transaction) => {
-            const category = getCategory(transaction.category_id);
-            const categoryColor = category?.color || "#6366F1";
-            const categoryIcon = category?.icon || "tag";
-            const amountClass =
-                transaction.type === "income"
-                    ? "income"
-                    : "expense";
+  tableBody.innerHTML = transactions
+    .map((transaction) => {
+      const category = getCategory(transaction.category_id);
+      const categoryColor = category?.color || "#6366F1";
+      const categoryIcon = category?.icon || "tag";
+      const amountClass = transaction.type === "income" ? "income" : "expense";
 
-            return `
+      return `
                 <tr>
                     <td data-label="Transaction">
                         <div class="table-transaction">
@@ -977,17 +787,12 @@ function renderTransactionsPage() {
                                 class="table-transaction-icon"
                                 style="
                                     background-color:
-                                        ${hexToRGBA(
-                                            categoryColor,
-                                            0.12
-                                        )};
+                                        ${hexToRGBA(categoryColor, 0.12)};
                                     color: ${categoryColor};
                                 "
                             >
                                 <i
-                                    data-lucide="${
-                                        escapeHTML(categoryIcon)
-                                    }"
+                                    data-lucide="${escapeHTML(categoryIcon)}"
                                 ></i>
                             </span>
 
@@ -997,21 +802,16 @@ function renderTransactionsPage() {
                                 </strong>
 
                                 <span>
-                                    ${
-                                        escapeHTML(
-                                            transaction.notes ||
-                                                "No notes"
-                                        )
-                                    }
+                                    ${escapeHTML(
+                                      transaction.notes || "No notes",
+                                    )}
                                 </span>
                             </div>
                         </div>
                     </td>
 
                     <td data-label="Category">
-                        ${escapeHTML(
-                            category?.name || "Uncategorized"
-                        )}
+                        ${escapeHTML(category?.name || "Uncategorized")}
                     </td>
 
                     <td data-label="Date">
@@ -1031,9 +831,7 @@ function renderTransactionsPage() {
                         data-label="Amount"
                     >
                         <span
-                            class="transaction-amount ${
-                                amountClass
-                            }"
+                            class="transaction-amount ${amountClass}"
                         >
                             ${formatTransactionAmount(transaction)}
                         </span>
@@ -1049,9 +847,9 @@ function renderTransactionsPage() {
                                 type="button"
                                 data-action="edit-transaction"
                                 data-id="${escapeHTML(transaction.id)}"
-                                aria-label="Edit ${
-                                    escapeHTML(transaction.title)
-                                }"
+                                aria-label="Edit ${escapeHTML(
+                                  transaction.title,
+                                )}"
                             >
                                 <i data-lucide="pencil"></i>
                             </button>
@@ -1061,9 +859,9 @@ function renderTransactionsPage() {
                                 type="button"
                                 data-action="delete-transaction"
                                 data-id="${escapeHTML(transaction.id)}"
-                                aria-label="Delete ${
-                                    escapeHTML(transaction.title)
-                                }"
+                                aria-label="Delete ${escapeHTML(
+                                  transaction.title,
+                                )}"
                             >
                                 <i data-lucide="trash-2"></i>
                             </button>
@@ -1071,10 +869,10 @@ function renderTransactionsPage() {
                     </td>
                 </tr>
             `;
-        })
-        .join("");
+    })
+    .join("");
 
-    refreshIcons();
+  refreshIcons();
 }
 
 /* =========================================================
@@ -1082,14 +880,11 @@ function renderTransactionsPage() {
 ========================================================= */
 
 function renderCategoryCard(category) {
-    const categoryTransactionCount = state.transactions.filter(
-        (transaction) => {
-            return String(transaction.category_id) ===
-                String(category.id);
-        }
-    ).length;
+  const categoryTransactionCount = state.transactions.filter((transaction) => {
+    return String(transaction.category_id) === String(category.id);
+  }).length;
 
-    return `
+  return `
         <article
             class="category-card"
             style="--category-color: ${category.color};"
@@ -1111,9 +906,9 @@ function renderCategoryCard(category) {
                 <span>
                     ${categoryTransactionCount}
                     ${
-                        categoryTransactionCount === 1
-                            ? "transaction"
-                            : "transactions"
+                      categoryTransactionCount === 1
+                        ? "transaction"
+                        : "transactions"
                     }
                 </span>
             </div>
@@ -1144,42 +939,34 @@ function renderCategoryCard(category) {
 }
 
 function renderCategoriesPage() {
-    const incomeCategories = state.categories
-        .filter((category) => category.type === "income")
-        .sort((first, second) => {
-            return first.name.localeCompare(second.name);
-        });
+  const incomeCategories = state.categories
+    .filter((category) => category.type === "income")
+    .sort((first, second) => {
+      return first.name.localeCompare(second.name);
+    });
 
-    const expenseCategories = state.categories
-        .filter((category) => category.type === "expense")
-        .sort((first, second) => {
-            return first.name.localeCompare(second.name);
-        });
+  const expenseCategories = state.categories
+    .filter((category) => category.type === "expense")
+    .sort((first, second) => {
+      return first.name.localeCompare(second.name);
+    });
 
-    const incomeGrid = getElement("#income-category-grid");
-    const expenseGrid = getElement("#expense-category-grid");
+  const incomeGrid = getElement("#income-category-grid");
+  const expenseGrid = getElement("#expense-category-grid");
 
-    getElement("#income-category-count").textContent =
-        incomeCategories.length;
+  getElement("#income-category-count").textContent = incomeCategories.length;
 
-    getElement("#expense-category-count").textContent =
-        expenseCategories.length;
+  getElement("#expense-category-count").textContent = expenseCategories.length;
 
-    getElement("#income-category-empty").hidden =
-        incomeCategories.length > 0;
+  getElement("#income-category-empty").hidden = incomeCategories.length > 0;
 
-    getElement("#expense-category-empty").hidden =
-        expenseCategories.length > 0;
+  getElement("#expense-category-empty").hidden = expenseCategories.length > 0;
 
-    incomeGrid.innerHTML = incomeCategories
-        .map(renderCategoryCard)
-        .join("");
+  incomeGrid.innerHTML = incomeCategories.map(renderCategoryCard).join("");
 
-    expenseGrid.innerHTML = expenseCategories
-        .map(renderCategoryCard)
-        .join("");
+  expenseGrid.innerHTML = expenseCategories.map(renderCategoryCard).join("");
 
-    refreshIcons();
+  refreshIcons();
 }
 
 /* =========================================================
@@ -1187,54 +974,54 @@ function renderCategoriesPage() {
 ========================================================= */
 
 function openModal(modalId) {
-    const modal = getElement(modalId);
+  const modal = getElement(modalId);
 
-    if (!modal) {
-        return;
-    }
+  if (!modal) {
+    return;
+  }
 
-    modal.hidden = false;
-    document.body.classList.add("modal-open");
+  modal.hidden = false;
+  document.body.classList.add("modal-open");
 }
 
 function closeModal(modalId) {
-    const modal = getElement(modalId);
+  const modal = getElement(modalId);
 
-    if (!modal) {
-        return;
-    }
+  if (!modal) {
+    return;
+  }
 
-    modal.hidden = true;
+  modal.hidden = true;
 
-    const hasVisibleModal = getElements(".modal").some(
-        (currentModal) => !currentModal.hidden
-    );
+  const hasVisibleModal = getElements(".modal").some(
+    (currentModal) => !currentModal.hidden,
+  );
 
-    if (!hasVisibleModal) {
-        document.body.classList.remove("modal-open");
-    }
+  if (!hasVisibleModal) {
+    document.body.classList.remove("modal-open");
+  }
 }
 
 function closeAllModals() {
-    getElements(".modal").forEach((modal) => {
-        modal.hidden = true;
-    });
+  getElements(".modal").forEach((modal) => {
+    modal.hidden = true;
+  });
 
-    document.body.classList.remove("modal-open");
+  document.body.classList.remove("modal-open");
 }
 
 function showFormError(elementId, message) {
-    const element = getElement(elementId);
+  const element = getElement(elementId);
 
-    element.textContent = message;
-    element.hidden = false;
+  element.textContent = message;
+  element.hidden = false;
 }
 
 function clearFormError(elementId) {
-    const element = getElement(elementId);
+  const element = getElement(elementId);
 
-    element.textContent = "";
-    element.hidden = true;
+  element.textContent = "";
+  element.hidden = true;
 }
 
 /* =========================================================
@@ -1242,203 +1029,180 @@ function clearFormError(elementId) {
 ========================================================= */
 
 function getDefaultTransactionDate() {
-    const today = new Date();
-    const todayYear = today.getFullYear();
-    const todayMonth = String(today.getMonth() + 1).padStart(
-        2,
-        "0"
-    );
-    const todayDay = String(today.getDate()).padStart(2, "0");
+  const today = new Date();
+  const todayYear = today.getFullYear();
+  const todayMonth = String(today.getMonth() + 1).padStart(2, "0");
+  const todayDay = String(today.getDate()).padStart(2, "0");
 
-    const currentMonth = `${todayYear}-${todayMonth}`;
+  const currentMonth = `${todayYear}-${todayMonth}`;
 
-    if (currentMonth === state.selectedMonth) {
-        return `${currentMonth}-${todayDay}`;
-    }
+  if (currentMonth === state.selectedMonth) {
+    return `${currentMonth}-${todayDay}`;
+  }
 
-    return `${state.selectedMonth}-01`;
+  return `${state.selectedMonth}-01`;
 }
 
 function openNewTransactionModal() {
-    state.editingTransactionId = null;
+  state.editingTransactionId = null;
 
-    const form = getElement("#transaction-form");
+  const form = getElement("#transaction-form");
 
-    form.reset();
+  form.reset();
 
-    getElement("#transaction-id").value = "";
-    getElement("#transaction-type").value = "expense";
-    getElement("#transaction-date").value =
-        getDefaultTransactionDate();
+  getElement("#transaction-id").value = "";
+  getElement("#transaction-type").value = "expense";
+  getElement("#transaction-date").value = getDefaultTransactionDate();
 
-    getElement("#transaction-modal-title").textContent =
-        "Add Transaction";
+  getElement("#transaction-modal-title").textContent = "Add Transaction";
 
-    getElement("#transaction-submit-label").textContent =
-        "Save Transaction";
+  getElement("#transaction-submit-label").textContent = "Save Transaction";
 
-    populateTransactionCategorySelect();
-    clearFormError("#transaction-form-error");
-    openModal("#transaction-modal");
+  populateTransactionCategorySelect();
+  clearFormError("#transaction-form-error");
+  openModal("#transaction-modal");
 
-    getElement("#transaction-title").focus();
+  getElement("#transaction-title").focus();
 }
 
 function openEditTransactionModal(transactionId) {
-    const transaction = state.transactions.find(
-        (currentTransaction) => {
-            return String(currentTransaction.id) ===
-                String(transactionId);
-        }
+  const transaction = state.transactions.find((currentTransaction) => {
+    return String(currentTransaction.id) === String(transactionId);
+  });
+
+  if (!transaction) {
+    showToast(
+      "error",
+      "Transaction not found",
+      "The selected transaction no longer exists.",
     );
 
-    if (!transaction) {
-        showToast(
-            "error",
-            "Transaction not found",
-            "The selected transaction no longer exists."
-        );
+    return;
+  }
 
-        return;
-    }
+  state.editingTransactionId = transaction.id;
 
-    state.editingTransactionId = transaction.id;
+  getElement("#transaction-id").value = transaction.id;
+  getElement("#transaction-title").value = transaction.title;
+  getElement("#transaction-amount").value = transaction.amount;
+  getElement("#transaction-type").value = transaction.type;
 
-    getElement("#transaction-id").value = transaction.id;
-    getElement("#transaction-title").value = transaction.title;
-    getElement("#transaction-amount").value = transaction.amount;
-    getElement("#transaction-type").value = transaction.type;
+  populateTransactionCategorySelect(transaction.category_id);
 
-    populateTransactionCategorySelect(
-        transaction.category_id
-    );
+  getElement("#transaction-date").value = transaction.transaction_date;
 
-    getElement("#transaction-date").value =
-        transaction.transaction_date;
+  getElement("#transaction-notes").value = transaction.notes || "";
 
-    getElement("#transaction-notes").value =
-        transaction.notes || "";
+  getElement("#transaction-modal-title").textContent = "Edit Transaction";
 
-    getElement("#transaction-modal-title").textContent =
-        "Edit Transaction";
+  getElement("#transaction-submit-label").textContent = "Update Transaction";
 
-    getElement("#transaction-submit-label").textContent =
-        "Update Transaction";
+  clearFormError("#transaction-form-error");
+  openModal("#transaction-modal");
 
-    clearFormError("#transaction-form-error");
-    openModal("#transaction-modal");
-
-    getElement("#transaction-title").focus();
+  getElement("#transaction-title").focus();
 }
 
-function handleTransactionSubmit(event) {
-    event.preventDefault();
+async function handleTransactionSubmit(event) {
+  event.preventDefault();
 
-    clearFormError("#transaction-form-error");
+  clearFormError("#transaction-form-error");
 
-    const title = getElement("#transaction-title").value.trim();
-    const amount = Number(
-        getElement("#transaction-amount").value
+  const title = getElement("#transaction-title").value.trim();
+  const amount = Number(getElement("#transaction-amount").value);
+  const type = getElement("#transaction-type").value;
+  const categoryId = getElement("#transaction-category").value;
+  const transactionDate = getElement("#transaction-date").value;
+  const notes = getElement("#transaction-notes").value.trim();
+
+  if (!title) {
+    showFormError("#transaction-form-error", "Transaction title is required.");
+
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    showFormError(
+      "#transaction-form-error",
+      "Amount must be greater than zero.",
     );
-    const type = getElement("#transaction-type").value;
-    const categoryId =
-        getElement("#transaction-category").value;
-    const transactionDate =
-        getElement("#transaction-date").value;
-    const notes =
-        getElement("#transaction-notes").value.trim();
 
-    if (!title) {
-        showFormError(
-            "#transaction-form-error",
-            "Transaction title is required."
-        );
+    return;
+  }
 
-        return;
-    }
+  const category = getCategory(categoryId);
 
-    if (!Number.isFinite(amount) || amount <= 0) {
-        showFormError(
-            "#transaction-form-error",
-            "Amount must be greater than zero."
-        );
+  if (!category) {
+    showFormError("#transaction-form-error", "Please select a valid category.");
 
-        return;
-    }
+    return;
+  }
 
-    const category = getCategory(categoryId);
+  if (category.type !== type) {
+    showFormError(
+      "#transaction-form-error",
+      "The selected category does not match the transaction type.",
+    );
 
-    if (!category) {
-        showFormError(
-            "#transaction-form-error",
-            "Please select a valid category."
-        );
+    return;
+  }
 
-        return;
-    }
+  if (!transactionDate) {
+    showFormError("#transaction-form-error", "Transaction date is required.");
 
-    if (category.type !== type) {
-        showFormError(
-            "#transaction-form-error",
-            "The selected category does not match the transaction type."
-        );
+    return;
+  }
 
-        return;
-    }
+  const transactionData = {
+    title,
+    amount,
+    type,
+    categoryId: Number(categoryId),
+    transactionDate,
+    notes,
+  };
+  const isEditing = Boolean(state.editingTransactionId);
 
-    if (!transactionDate) {
-        showFormError(
-            "#transaction-form-error",
-            "Transaction date is required."
-        );
+  const endpoint = isEditing
+    ? `/transactions/${state.editingTransactionId}`
+    : "/transactions";
 
-        return;
-    }
+  const method = isEditing ? "PUT" : "POST";
 
-    const transactionData = {
-        title,
-        amount,
-        type,
-        category_id: categoryId,
-        transaction_date: transactionDate,
-        notes
-    };
+  try {
+    const result = await apiRequest(endpoint, {
+      method,
+      body: JSON.stringify(transactionData),
+    });
 
-    if (state.editingTransactionId) {
-        const transactionIndex = state.transactions.findIndex(
-            (transaction) => {
-                return String(transaction.id) ===
-                    String(state.editingTransactionId);
-            }
-        );
+    const savedTransaction = result.data;
 
-        if (transactionIndex !== -1) {
-            state.transactions[transactionIndex] = {
-                ...state.transactions[transactionIndex],
-                ...transactionData
-            };
-        }
+    if (isEditing) {
+      const transactionIndex = state.transactions.findIndex(
+        (transaction) =>
+          String(transaction.id) === String(state.editingTransactionId),
+      );
 
-        showToast(
-            "success",
-            "Transaction updated",
-            `${title} was updated successfully.`
-        );
+      if (transactionIndex !== -1) {
+        state.transactions[transactionIndex] = savedTransaction;
+      }
     } else {
-        state.transactions.push({
-            id: createNextId(state.transactions),
-            ...transactionData
-        });
-
-        showToast(
-            "success",
-            "Transaction added",
-            `${title} was added successfully.`
-        );
+      state.transactions.unshift(savedTransaction);
     }
 
     closeModal("#transaction-modal");
     renderApplicationData();
+
+    showToast(
+      "success",
+      isEditing ? "Transaction updated" : "Transaction added",
+      `${title} was ${isEditing ? "updated" : "added"} successfully.`,
+    );
+  } catch (error) {
+    console.error("Failed to save transaction:", error);
+
+    showFormError("#transaction-form-error", error.message);
+  }
 }
 
 /* =========================================================
@@ -1446,159 +1210,135 @@ function handleTransactionSubmit(event) {
 ========================================================= */
 
 function openNewCategoryModal() {
-    state.editingCategoryId = null;
+  state.editingCategoryId = null;
 
-    const form = getElement("#category-form");
-    const typeSelect = getElement("#category-type");
+  const form = getElement("#category-form");
+  const typeSelect = getElement("#category-type");
 
-    form.reset();
+  form.reset();
 
-    getElement("#category-id").value = "";
-    typeSelect.value = "expense";
-    typeSelect.disabled = false;
-    getElement("#category-color").value = "#6366f1";
-    getElement("#category-icon").value = "tag";
+  getElement("#category-id").value = "";
+  typeSelect.value = "expense";
+  typeSelect.disabled = false;
+  getElement("#category-color").value = "#6366f1";
+  getElement("#category-icon").value = "tag";
 
-    getElement("#category-modal-title").textContent =
-        "Add Category";
+  getElement("#category-modal-title").textContent = "Add Category";
 
-    getElement("#category-submit-label").textContent =
-        "Save Category";
+  getElement("#category-submit-label").textContent = "Save Category";
 
-    clearFormError("#category-form-error");
-    openModal("#category-modal");
+  clearFormError("#category-form-error");
+  openModal("#category-modal");
 
-    getElement("#category-name").focus();
+  getElement("#category-name").focus();
 }
 
 function openEditCategoryModal(categoryId) {
-    const category = getCategory(categoryId);
+  const category = getCategory(categoryId);
 
-    if (!category) {
-        showToast(
-            "error",
-            "Category not found",
-            "The selected category no longer exists."
-        );
-
-        return;
-    }
-
-    state.editingCategoryId = category.id;
-
-    getElement("#category-id").value = category.id;
-    getElement("#category-name").value = category.name;
-    getElement("#category-type").value = category.type;
-    getElement("#category-color").value = category.color;
-    getElement("#category-icon").value = category.icon;
-
-    const categoryIsUsed = state.transactions.some(
-        (transaction) => {
-            return String(transaction.category_id) ===
-                String(category.id);
-        }
+  if (!category) {
+    showToast(
+      "error",
+      "Category not found",
+      "The selected category no longer exists.",
     );
 
-    getElement("#category-type").disabled = categoryIsUsed;
+    return;
+  }
 
-    getElement("#category-modal-title").textContent =
-        "Edit Category";
+  state.editingCategoryId = category.id;
 
-    getElement("#category-submit-label").textContent =
-        "Update Category";
+  getElement("#category-id").value = category.id;
+  getElement("#category-name").value = category.name;
+  getElement("#category-type").value = category.type;
+  getElement("#category-color").value = category.color;
+  getElement("#category-icon").value = category.icon;
 
-    clearFormError("#category-form-error");
-    openModal("#category-modal");
+  const categoryIsUsed = state.transactions.some((transaction) => {
+    return String(transaction.category_id) === String(category.id);
+  });
 
-    getElement("#category-name").focus();
+  getElement("#category-type").disabled = categoryIsUsed;
+
+  getElement("#category-modal-title").textContent = "Edit Category";
+
+  getElement("#category-submit-label").textContent = "Update Category";
+
+  clearFormError("#category-form-error");
+  openModal("#category-modal");
+
+  getElement("#category-name").focus();
 }
 
-function handleCategorySubmit(event) {
-    event.preventDefault();
+async function handleCategorySubmit(event) {
+  event.preventDefault();
 
-    clearFormError("#category-form-error");
+  clearFormError("#category-form-error");
 
-    const name = getElement("#category-name").value.trim();
-    const type = getElement("#category-type").value;
-    const color = getElement("#category-color").value;
-    const icon = getElement("#category-icon").value;
+  const name = getElement("#category-name").value.trim();
+  const type = getElement("#category-type").value;
+  const color = getElement("#category-color").value;
+  const icon = getElement("#category-icon").value;
 
-    if (!name) {
-        showFormError(
-            "#category-form-error",
-            "Category name is required."
-        );
+  if (!name) {
+    showFormError("#category-form-error", "Category name is required.");
 
-        return;
-    }
+    return;
+  }
 
-    const duplicateCategory = state.categories.find(
-        (category) => {
-            const hasSameName =
-                category.name.toLowerCase() ===
-                name.toLowerCase();
+  const duplicateCategory = state.categories.find((category) => {
+    const hasSameName = category.name.toLowerCase() === name.toLowerCase();
 
-            const hasSameType = category.type === type;
+    const hasSameType = category.type === type;
 
-            const isDifferentCategory =
-                String(category.id) !==
-                String(state.editingCategoryId);
+    const isDifferentCategory =
+      String(category.id) !== String(state.editingCategoryId);
 
-            return (
-                hasSameName &&
-                hasSameType &&
-                isDifferentCategory
-            );
-        }
+    return hasSameName && hasSameType && isDifferentCategory;
+  });
+
+  if (duplicateCategory) {
+    showFormError(
+      "#category-form-error",
+      "A category with this name and type already exists.",
     );
 
-    if (duplicateCategory) {
-        showFormError(
-            "#category-form-error",
-            "A category with this name and type already exists."
-        );
+    return;
+  }
 
-        return;
-    }
+  const categoryData = {
+    name,
+    type,
+    color,
+    icon,
+  };
 
-    const categoryData = {
-        name,
-        type,
-        color,
-        icon
-    };
+  const isEditing = Boolean(state.editingCategoryId);
 
-    if (state.editingCategoryId) {
-        const categoryIndex = state.categories.findIndex(
-            (category) => {
-                return String(category.id) ===
-                    String(state.editingCategoryId);
-            }
-        );
+  const endpoint = isEditing
+    ? `/categories/${state.editingCategoryId}`
+    : "/categories";
 
-        if (categoryIndex !== -1) {
-            state.categories[categoryIndex] = {
-                ...state.categories[categoryIndex],
-                ...categoryData
-            };
-        }
+  const method = isEditing ? "PUT" : "POST";
 
-        showToast(
-            "success",
-            "Category updated",
-            `${name} was updated successfully.`
-        );
+  try {
+    const result = await apiRequest(endpoint, {
+      method,
+      body: JSON.stringify(categoryData),
+    });
+
+    const savedCategory = result.data;
+
+    if (isEditing) {
+      const categoryIndex = state.categories.findIndex(
+        (category) => String(category.id) === String(state.editingCategoryId),
+      );
+
+      if (categoryIndex !== -1) {
+        state.categories[categoryIndex] = savedCategory;
+      }
     } else {
-        state.categories.push({
-            id: createNextId(state.categories),
-            ...categoryData
-        });
-
-        showToast(
-            "success",
-            "Category added",
-            `${name} was added successfully.`
-        );
+      state.categories.push(savedCategory);
     }
 
     getElement("#category-type").disabled = false;
@@ -1607,6 +1347,17 @@ function handleCategorySubmit(event) {
     populateCategoryFilter();
     populateTransactionCategorySelect();
     renderApplicationData();
+
+    showToast(
+      "success",
+      isEditing ? "Category updated" : "Category added",
+      `${name} was ${isEditing ? "updated" : "added"} successfully.`,
+    );
+  } catch (error) {
+    console.error("Failed to save category:", error);
+
+    showFormError("#category-form-error", error.message);
+  }
 }
 
 /* =========================================================
@@ -1614,110 +1365,94 @@ function handleCategorySubmit(event) {
 ========================================================= */
 
 function openDeleteModal(type, itemId) {
-    let itemName = "";
+  let itemName = "";
 
-    if (type === "transaction") {
-        const transaction = state.transactions.find(
-            (currentTransaction) => {
-                return String(currentTransaction.id) ===
-                    String(itemId);
-            }
-        );
+  if (type === "transaction") {
+    const transaction = state.transactions.find((currentTransaction) => {
+      return String(currentTransaction.id) === String(itemId);
+    });
 
-        if (!transaction) {
-            return;
-        }
-
-        itemName = transaction.title;
+    if (!transaction) {
+      return;
     }
 
-    if (type === "category") {
-        const category = getCategory(itemId);
+    itemName = transaction.title;
+  }
 
-        if (!category) {
-            return;
-        }
+  if (type === "category") {
+    const category = getCategory(itemId);
 
-        itemName = category.name;
+    if (!category) {
+      return;
     }
 
-    state.deleteTarget = {
-        type,
-        id: String(itemId),
-        name: itemName
-    };
+    itemName = category.name;
+  }
 
-    getElement("#delete-modal-message").textContent =
-        `Are you sure you want to delete "${itemName}"? ` +
-        "This action cannot be undone.";
+  state.deleteTarget = {
+    type,
+    id: String(itemId),
+    name: itemName,
+  };
 
-    openModal("#delete-modal");
+  getElement("#delete-modal-message").textContent =
+    `Are you sure you want to delete "${itemName}"? ` +
+    "This action cannot be undone.";
+
+  openModal("#delete-modal");
 }
 
-function confirmDeletion() {
-    const target = state.deleteTarget;
+async function confirmDeletion() {
+  const target = state.deleteTarget;
 
-    if (!target) {
-        return;
-    }
+  if (!target) {
+    return;
+  }
+
+  const endpoint =
+    target.type === "transaction"
+      ? `/transactions/${target.id}`
+      : `/categories/${target.id}`;
+
+  try {
+    await apiRequest(endpoint, {
+      method: "DELETE",
+    });
 
     if (target.type === "transaction") {
-        state.transactions = state.transactions.filter(
-            (transaction) => {
-                return String(transaction.id) !==
-                    String(target.id);
-            }
-        );
-
-        showToast(
-            "success",
-            "Transaction deleted",
-            `${target.name} was deleted successfully.`
-        );
+      state.transactions = state.transactions.filter(
+        (transaction) => String(transaction.id) !== String(target.id),
+      );
     }
 
     if (target.type === "category") {
-        const categoryIsUsed = state.transactions.some(
-            (transaction) => {
-                return String(transaction.category_id) ===
-                    String(target.id);
-            }
-        );
+      state.categories = state.categories.filter(
+        (category) => String(category.id) !== String(target.id),
+      );
 
-        if (categoryIsUsed) {
-            closeModal("#delete-modal");
-
-            showToast(
-                "error",
-                "Category cannot be deleted",
-                "This category is currently used by transactions."
-            );
-
-            state.deleteTarget = null;
-            return;
-        }
-
-        state.categories = state.categories.filter(
-            (category) => {
-                return String(category.id) !==
-                    String(target.id);
-            }
-        );
-
-        populateCategoryFilter();
-        populateTransactionCategorySelect();
-
-        showToast(
-            "success",
-            "Category deleted",
-            `${target.name} was deleted successfully.`
-        );
+      populateCategoryFilter();
+      populateTransactionCategorySelect();
     }
 
+    closeModal("#delete-modal");
     state.deleteTarget = null;
+    renderApplicationData();
+
+    showToast(
+      "success",
+      target.type === "transaction"
+        ? "Transaction deleted"
+        : "Category deleted",
+      `${target.name} was deleted successfully.`,
+    );
+  } catch (error) {
+    console.error("Failed to delete item:", error);
 
     closeModal("#delete-modal");
-    renderApplicationData();
+    state.deleteTarget = null;
+
+    showToast("error", "Unable to delete", error.message);
+  }
 }
 
 /* =========================================================
@@ -1725,15 +1460,14 @@ function confirmDeletion() {
 ========================================================= */
 
 function showToast(type, title, message) {
-    const container = getElement("#toast-container");
-    const toast = document.createElement("article");
+  const container = getElement("#toast-container");
+  const toast = document.createElement("article");
 
-    const iconName =
-        type === "success" ? "circle-check" : "circle-alert";
+  const iconName = type === "success" ? "circle-check" : "circle-alert";
 
-    toast.className = `toast ${type}`;
+  toast.className = `toast ${type}`;
 
-    toast.innerHTML = `
+  toast.innerHTML = `
         <span class="toast-icon">
             <i data-lucide="${iconName}"></i>
         </span>
@@ -1752,18 +1486,16 @@ function showToast(type, title, message) {
         </button>
     `;
 
-    container.append(toast);
-    refreshIcons();
+  container.append(toast);
+  refreshIcons();
 
-    const removeToast = () => {
-        toast.remove();
-    };
+  const removeToast = () => {
+    toast.remove();
+  };
 
-    toast
-        .querySelector(".toast-close")
-        .addEventListener("click", removeToast);
+  toast.querySelector(".toast-close").addEventListener("click", removeToast);
 
-    window.setTimeout(removeToast, 4500);
+  window.setTimeout(removeToast, 4500);
 }
 
 /* =========================================================
@@ -1771,11 +1503,11 @@ function showToast(type, title, message) {
 ========================================================= */
 
 function renderApplicationData() {
-    populateCategoryFilter();
-    renderDashboard();
-    renderTransactionsPage();
-    renderCategoriesPage();
-    refreshIcons();
+  populateCategoryFilter();
+  renderDashboard();
+  renderTransactionsPage();
+  renderCategoriesPage();
+  refreshIcons();
 }
 
 /* =========================================================
@@ -1783,192 +1515,196 @@ function renderApplicationData() {
 ========================================================= */
 
 function registerEventListeners() {
-    getElements("[data-page-target]").forEach((button) => {
-        button.addEventListener("click", () => {
-            navigateTo(button.dataset.pageTarget);
-        });
+  getElements("[data-page-target]").forEach((button) => {
+    button.addEventListener("click", () => {
+      navigateTo(button.dataset.pageTarget);
     });
+  });
 
-    getElement("#mobile-menu-button").addEventListener(
-        "click",
-        openSidebar
-    );
+  getElement("#mobile-menu-button").addEventListener("click", openSidebar);
 
-    getElement("#sidebar-close").addEventListener(
-        "click",
-        closeSidebar
-    );
+  getElement("#sidebar-close").addEventListener("click", closeSidebar);
 
-    getElement("#sidebar-overlay").addEventListener(
-        "click",
-        closeSidebar
-    );
+  getElement("#sidebar-overlay").addEventListener("click", closeSidebar);
 
-    getElement("#global-month").addEventListener(
-        "change",
-        (event) => {
-            if (!event.target.value) {
-                return;
-            }
+  getElement("#global-month").addEventListener("change", (event) => {
+    if (!event.target.value) {
+      return;
+    }
 
-            state.selectedMonth = event.target.value;
+    state.selectedMonth = event.target.value;
 
-            getElement("#transaction-month-filter").value =
-                state.selectedMonth;
+    getElement("#transaction-month-filter").value = state.selectedMonth;
 
-            renderDashboard();
-            renderTransactionsPage();
-        }
-    );
+    renderDashboard();
+    renderTransactionsPage();
+  });
 
-    getElement("#transaction-search").addEventListener(
-        "input",
-        renderTransactionsPage
-    );
+  getElement("#transaction-search").addEventListener(
+    "input",
+    renderTransactionsPage,
+  );
 
-    getElement("#transaction-month-filter").addEventListener(
-        "change",
-        renderTransactionsPage
-    );
+  getElement("#transaction-month-filter").addEventListener(
+    "change",
+    renderTransactionsPage,
+  );
 
-    getElement("#transaction-type-filter").addEventListener(
-        "change",
-        renderTransactionsPage
-    );
+  getElement("#transaction-type-filter").addEventListener(
+    "change",
+    renderTransactionsPage,
+  );
 
-    getElement("#transaction-category-filter").addEventListener(
-        "change",
-        renderTransactionsPage
-    );
+  getElement("#transaction-category-filter").addEventListener(
+    "change",
+    renderTransactionsPage,
+  );
 
-    getElement("#reset-transaction-filters").addEventListener(
-        "click",
-        () => {
-            getElement("#transaction-search").value = "";
-            getElement("#transaction-month-filter").value =
-                state.selectedMonth;
+  getElement("#reset-transaction-filters").addEventListener("click", () => {
+    getElement("#transaction-search").value = "";
+    getElement("#transaction-month-filter").value = state.selectedMonth;
 
-            getElement("#transaction-type-filter").value = "";
-            getElement("#transaction-category-filter").value = "";
+    getElement("#transaction-type-filter").value = "";
+    getElement("#transaction-category-filter").value = "";
 
-            renderTransactionsPage();
-        }
-    );
+    renderTransactionsPage();
+  });
 
-    getElement("#open-transaction-modal").addEventListener(
-        "click",
-        openNewTransactionModal
-    );
+  getElement("#open-transaction-modal").addEventListener(
+    "click",
+    openNewTransactionModal,
+  );
 
-    getElement(
-        "#open-transaction-modal-secondary"
-    ).addEventListener(
-        "click",
-        openNewTransactionModal
-    );
+  getElement("#open-transaction-modal-secondary").addEventListener(
+    "click",
+    openNewTransactionModal,
+  );
 
-    getElement("#open-category-modal").addEventListener(
-        "click",
-        openNewCategoryModal
-    );
+  getElement("#open-category-modal").addEventListener(
+    "click",
+    openNewCategoryModal,
+  );
 
-    getElement("#transaction-type").addEventListener(
-        "change",
-        () => {
-            populateTransactionCategorySelect();
-        }
-    );
+  getElement("#transaction-type").addEventListener("change", () => {
+    populateTransactionCategorySelect();
+  });
 
-    getElement("#transaction-form").addEventListener(
-        "submit",
-        handleTransactionSubmit
-    );
+  getElement("#transaction-form").addEventListener(
+    "submit",
+    handleTransactionSubmit,
+  );
 
-    getElement("#category-form").addEventListener(
-        "submit",
-        handleCategorySubmit
-    );
+  getElement("#category-form").addEventListener("submit", handleCategorySubmit);
 
-    getElement("#confirm-delete-button").addEventListener(
-        "click",
-        confirmDeletion
-    );
+  getElement("#confirm-delete-button").addEventListener(
+    "click",
+    confirmDeletion,
+  );
 
-    getElements("[data-close-modal]").forEach((element) => {
-        element.addEventListener("click", () => {
-            const modalType = element.dataset.closeModal;
+  getElements("[data-close-modal]").forEach((element) => {
+    element.addEventListener("click", () => {
+      const modalType = element.dataset.closeModal;
 
-            closeModal(`#${modalType}-modal`);
+      closeModal(`#${modalType}-modal`);
 
-            if (modalType === "category") {
-                getElement("#category-type").disabled = false;
-            }
+      if (modalType === "category") {
+        getElement("#category-type").disabled = false;
+      }
 
-            if (modalType === "delete") {
-                state.deleteTarget = null;
-            }
-        });
+      if (modalType === "delete") {
+        state.deleteTarget = null;
+      }
     });
+  });
 
-    document.addEventListener("click", (event) => {
-        const actionButton = event.target.closest(
-            "[data-action]"
-        );
+  document.addEventListener("click", (event) => {
+    const actionButton = event.target.closest("[data-action]");
 
-        if (!actionButton) {
-            return;
-        }
+    if (!actionButton) {
+      return;
+    }
 
-        const action = actionButton.dataset.action;
-        const itemId = actionButton.dataset.id;
+    const action = actionButton.dataset.action;
+    const itemId = actionButton.dataset.id;
 
-        if (action === "edit-transaction") {
-            openEditTransactionModal(itemId);
-        }
+    if (action === "edit-transaction") {
+      openEditTransactionModal(itemId);
+    }
 
-        if (action === "delete-transaction") {
-            openDeleteModal("transaction", itemId);
-        }
+    if (action === "delete-transaction") {
+      openDeleteModal("transaction", itemId);
+    }
 
-        if (action === "edit-category") {
-            openEditCategoryModal(itemId);
-        }
+    if (action === "edit-category") {
+      openEditCategoryModal(itemId);
+    }
 
-        if (action === "delete-category") {
-            openDeleteModal("category", itemId);
-        }
-    });
+    if (action === "delete-category") {
+      openDeleteModal("category", itemId);
+    }
+  });
 
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-            closeAllModals();
-            closeSidebar();
-        }
-    });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeAllModals();
+      closeSidebar();
+    }
+  });
 
-    window.addEventListener("resize", () => {
-        if (window.innerWidth > 960) {
-            closeSidebar();
-        }
-    });
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 960) {
+      closeSidebar();
+    }
+  });
+
+  window.addEventListener("hashchange", () => {
+    const pageName = window.location.hash.slice(1);
+
+    if (pageInformation[pageName] && pageName !== state.activePage) {
+      navigateTo(pageName);
+    }
+  });
+}
+
+async function loadApplicationData() {
+  try {
+    const [categoriesResult, transactionsResult] = await Promise.all([
+      apiRequest("/categories"),
+      apiRequest("/transactions"),
+    ]);
+
+    state.categories = categoriesResult.data || [];
+    state.transactions = transactionsResult.data || [];
+
+    populateCategoryFilter();
+    populateTransactionCategorySelect();
+    renderApplicationData();
+  } catch (error) {
+    console.error("Failed to load application data:", error);
+
+    showToast("error", "Unable to load data", error.message);
+  }
 }
 
 /* =========================================================
    Application Initialization
 ========================================================= */
 
-function initializeApplication() {
-    populateMonthSelectors();
+async function initializeApplication() {
+  populateMonthSelectors();
+  registerEventListeners();
 
-    populateCategoryFilter();
-    populateTransactionCategorySelect();
-    registerEventListeners();
-    navigateTo("dashboard");
-    renderApplicationData();
-    refreshIcons();
+  const requestedPage = window.location.hash.slice(1);
+
+  const initialPage = pageInformation[requestedPage]
+    ? requestedPage
+    : "dashboard";
+
+  navigateTo(initialPage);
+
+  await loadApplicationData();
+
+  document.body.classList.remove("app-loading");
 }
 
-document.addEventListener(
-    "DOMContentLoaded",
-    initializeApplication
-);
+document.addEventListener("DOMContentLoaded", initializeApplication);
