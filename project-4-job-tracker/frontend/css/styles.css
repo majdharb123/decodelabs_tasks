@@ -1,0 +1,97 @@
+/* Shared colors for the website. */
+:root {
+  --background: #f6f8fb;
+  --surface: #ffffff;
+  --text: #142c4e;
+  --muted: #536782;
+  --border: #d2dde8;
+  --teal: #137f86;
+}
+
+/* Include padding and borders in element widths. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--background);
+  color: var(--text);
+}
+
+/* Center the content and keep space at the sides. */
+.container {
+  width: min(1180px, calc(100% - 48px));
+  margin-inline: auto;
+}
+
+.page-header {
+  padding-block: 36px 28px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.2;
+}
+
+.page-header p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* Four cards on larger screens. */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.stat-card {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.stat-card p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 17px;
+}
+
+.stat-card strong {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.stat-card .count-applied {
+  color: #236ec6;
+}
+
+.stat-card .count-interview {
+  color: #946200;
+}
+
+.stat-card .count-offer {
+  color: var(--teal);
+}
+
+/* Two cards per row on smaller screens. */
+@media (max-width: 700px) {
+  .container {
+    width: calc(100% - 32px);
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 18px;
+  }
+}

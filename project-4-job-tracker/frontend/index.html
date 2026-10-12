@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Job Application Tracker</title>
+
+    <!-- Website styles -->
+    <link rel="stylesheet" href="/css/styles.css" />
+
+    <!-- Browser logic -->
+    <script type="module" src="/js/app.js"></script>
+  </head>
+
+  <body>
+    <header class="container page-header">
+      <h1>Job Application Tracker</h1>
+      <p>Keep track of your next opportunity.</p>
+    </header>
+
+    <!-- The dashboard will be added here. -->
+    <main class="container" id="main-content">
+      <!-- Summary cards: JavaScript will update these counts later. -->
+      <section class="stats" aria-label="Application summary">
+        <article class="stat-card">
+          <p>Total</p>
+          <strong id="total-count">0</strong>
+        </article>
+
+        <article class="stat-card">
+          <p>Applied</p>
+          <strong id="applied-count" class="count-applied">0</strong>
+        </article>
+
+        <article class="stat-card">
+          <p>Interview</p>
+          <strong id="interview-count" class="count-interview">0</strong>
+        </article>
+
+        <article class="stat-card">
+          <p>Offer</p>
+          <strong id="offer-count" class="count-offer">0</strong>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
