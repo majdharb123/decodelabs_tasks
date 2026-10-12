@@ -14,12 +14,12 @@
   </head>
 
   <body>
+    <a class="skip-link" href="#main-content">Skip to applications</a>
     <header class="container page-header">
       <h1>Job Application Tracker</h1>
       <p>Keep track of your next opportunity.</p>
     </header>
 
-    <!-- The dashboard will be added here. -->
     <main class="container" id="main-content">
       <!-- Summary cards: JavaScript will update these counts later. -->
       <section class="stats" aria-label="Application summary">
@@ -43,6 +43,152 @@
           <strong id="offer-count" class="count-offer">0</strong>
         </article>
       </section>
+
+      <!-- Search, status filter, and the main action. -->
+      <section class="toolbar" aria-label="Application controls">
+        <div class="search-field">
+          <label class="sr-only" for="search-input">Search company or job title</label>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+            <path d="m16 16 4.5 4.5"></path>
+          </svg>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Search company or job title"
+            autocomplete="off"
+            maxlength="150"
+          />
+        </div>
+
+        <div>
+          <label class="sr-only" for="status-filter">Filter by status</label>
+          <select id="status-filter">
+            <option value="">All statuses</option>
+            <option value="Applied">Applied</option>
+            <option value="Interview">Interview</option>
+            <option value="Offer">Offer</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+
+        <button class="button button-primary" id="add-application-button" type="button">
+          <span aria-hidden="true">+</span> Add application
+        </button>
+      </section>
+
+      <div id="notice" class="notice" role="status" hidden></div>
+
+      <!-- JavaScript supplies the application rows. -->
+      <section class="applications-panel" aria-labelledby="applications-heading">
+        <div class="panel-heading">
+          <h2 id="applications-heading">Your applications</h2>
+          <p id="results-count" role="status">0 applications</p>
+        </div>
+
+        <div class="table-scroll" tabindex="0" aria-label="Applications table; scroll horizontally on small screens">
+          <table>
+            <caption class="sr-only">Job applications and their current status</caption>
+            <thead>
+              <tr>
+                <th scope="col">Company</th>
+                <th scope="col">Job title</th>
+                <th scope="col">Applied date</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="applications-body">
+              <tr>
+                <td class="empty-state" colspan="5">
+                  <strong>No applications yet</strong>
+                  <span>Add your first application to start tracking your progress.</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="preview-note" id="preview-note">Sample data for the interface preview.</p>
     </main>
+
+    <!-- One drawer is shared by Add and Edit. -->
+    <dialog class="application-dialog" id="application-dialog" aria-labelledby="application-dialog-title">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">YOUR NEXT OPPORTUNITY</p>
+          <h2 id="application-dialog-title">Add application</h2>
+        </div>
+        <button
+          class="icon-button"
+          type="button"
+          data-close-dialog="application-dialog"
+          aria-label="Close application form"
+        >×</button>
+      </div>
+
+      <form id="application-form" class="application-form">
+        <input id="application-id" name="id" type="hidden" />
+
+        <div class="form-fields">
+          <p class="form-intro">Keep the details of your application in one place.</p>
+
+          <div class="field">
+            <label for="company-input">Company</label>
+            <input id="company-input" name="company" type="text" maxlength="100" required autofocus />
+          </div>
+
+          <div class="field">
+            <label for="job-title-input">Job title</label>
+            <input id="job-title-input" name="job_title" type="text" maxlength="150" required />
+          </div>
+
+          <div class="field">
+            <label for="applied-date-input">Application date</label>
+            <input id="applied-date-input" name="applied_date" type="date" min="0001-01-01" max="9999-12-31" required />
+          </div>
+
+          <div class="field">
+            <label for="application-status-input">Status</label>
+            <select id="application-status-input" name="status" required>
+              <option value="Applied">Applied</option>
+              <option value="Interview">Interview</option>
+              <option value="Offer">Offer</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+
+          <p class="field-hint">All four fields are required.</p>
+          <div id="form-error" class="form-error" role="alert" hidden></div>
+        </div>
+
+        <div class="dialog-footer">
+          <button class="button button-secondary" type="button" data-close-dialog="application-dialog">
+            Cancel
+          </button>
+          <button class="button button-primary" id="save-application-button" type="submit" disabled>
+            Save application
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Deletion asks for confirmation in its own dialog. -->
+    <dialog class="delete-dialog" id="delete-dialog" aria-labelledby="delete-dialog-title" aria-describedby="delete-description">
+      <div class="delete-heading">
+        <h2 id="delete-dialog-title">Delete application?</h2>
+        <button class="icon-button" type="button" data-close-dialog="delete-dialog" aria-label="Close delete confirmation">×</button>
+      </div>
+      <p id="delete-description">
+        You are about to delete <strong id="delete-application-name">this application</strong>.
+        This action cannot be undone.
+      </p>
+      <div id="delete-error" class="form-error" role="alert" hidden></div>
+      <div class="delete-actions">
+        <button class="button button-secondary" type="button" data-close-dialog="delete-dialog" autofocus>Cancel</button>
+        <button class="button button-danger" id="confirm-delete-button" type="button" disabled>Delete application</button>
+      </div>
+    </dialog>
   </body>
 </html>
