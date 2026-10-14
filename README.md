@@ -2,7 +2,7 @@
 
 This repository contains the projects I developed during my **Full-Stack Development Internship at DecodeLabs**. The projects demonstrate my progression from building a client-side task manager to developing and deploying complete full-stack applications with REST APIs and PostgreSQL databases.
 
-[![Projects](https://img.shields.io/badge/Completed_Projects-3-8B5CF6?style=for-the-badge)](#projects)
+[![Projects](https://img.shields.io/badge/Projects-4-8B5CF6?style=for-the-badge)](#projects)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=for-the-badge&logo=javascript&logoColor=111827)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
@@ -14,6 +14,7 @@ This repository contains the projects I developed during my **Full-Stack Develop
 | [Project 1: Task Manager](Project-1-Task-Manager/) | A responsive client-side task manager focused on frontend fundamentals and browser-based data persistence. | HTML, CSS, JavaScript, Local Storage | Completed |
 | [Project 2: Full-Stack Task Manager](Project-2-Full-Stack-Task-Manager/) | A deployed full-stack task management system with a RESTful CRUD API and PostgreSQL database. | HTML, CSS, JavaScript, Node.js, Express.js, PostgreSQL | Completed |
 | [Project 3: ExpenseFlow](Project-3-Full-Stack-Expense-Tracker/) | A deployed full-stack expense tracker with financial summaries, transaction management, categories, filters, and cloud data persistence. | HTML, CSS, JavaScript, Node.js, Express.js, PostgreSQL | Completed |
+| [Project 4: Job Application Tracker](project-4-job-tracker/) | A full-stack job application tracker with CRUD operations, status summaries, combined search and filtering, and API error recovery. | HTML, CSS, JavaScript, Node.js, Express.js, PostgreSQL | Implemented and tested locally; deployment pending |
 
 ## Project 1: Task Manager
 
@@ -104,27 +105,37 @@ ExpenseFlow is a responsive full-stack financial tracking application. It allows
 
 > The deployed services use free hosting and may need a short time to wake up after a period of inactivity.
 
+## Project 4: Job Application Tracker
+
+The Job Application Tracker helps users organize job applications by company, role, application date, and current status. Its single-page frontend and REST API are served by the same Express application, and records are stored in PostgreSQL.
+
+### Main Features
+
+- Add, view, edit, and delete applications
+- Track Applied, Interview, Offer, and Rejected statuses
+- View Total, Applied, Interview, and Offer summary cards
+- Search by company or job title and combine the search with a status filter
+- Validate application details on the frontend and backend
+- Confirm deletions before sending them to the API
+- Keep data after page refresh
+- Display loading, empty, validation, and API error states
+- Recover from a failed data request with a Try again button
+- Use a responsive layout with horizontal table scrolling on smaller screens
+
+### Current Status
+
+The frontend, PostgreSQL CRUD API, and their integration have been implemented. Local checks cover CRUD operations, persistence, validation, combined search and filtering, the mobile layout, and recovery after a blocked API request. Cloud deployment is the next step; a live link will be added after verification.
+
+- **Documentation:** [Project 4 README](project-4-job-tracker/README.md)
+- **Source Code:** [Project 4 Folder](project-4-job-tracker/)
+
 ## Repository Structure
 
-```text
-decodelabs_tasks/
-|-- Project-1-Task-Manager/
-|   |-- index.html
-|   |-- script.js
-|   `-- style.css
-|
-|-- Project-2-Full-Stack-Task-Manager/
-|   |-- client/
-|   |-- server/
-|   `-- README.md
-|
-|-- Project-3-Full-Stack-Expense-Tracker/
-|   |-- client/
-|   |-- server/
-|   `-- README.md
-|
-`-- README.md
-```
+- [Project-1-Task-Manager/](Project-1-Task-Manager/): client-side HTML, CSS, and JavaScript application.
+- [Project-2-Full-Stack-Task-Manager/](Project-2-Full-Stack-Task-Manager/): separate client and server folders.
+- [Project-3-Full-Stack-Expense-Tracker/](Project-3-Full-Stack-Expense-Tracker/): separate client and server folders.
+- [project-4-job-tracker/](project-4-job-tracker/): frontend, backend, PostgreSQL schema, and setup documentation.
+- [README.md](README.md): repository overview and links to each project.
 
 ## Development Progression
 
