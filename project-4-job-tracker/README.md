@@ -2,7 +2,15 @@
 
 A full-stack web application for tracking job applications by company, job title, application date, and status. Built during my Full-Stack Development Internship at DecodeLabs.
 
-**Current status:** implemented and tested locally. Cloud deployment and the live demo link are pending.
+**Current status:** completed, deployed, and verified online on October 16, 2026.
+
+## Live Demo
+
+- **Website:** [Job Application Tracker](https://decodelabs-job-tracker.onrender.com)
+- **Applications API:** [GET /api/applications](https://decodelabs-job-tracker.onrender.com/api/applications)
+- **Health check:** [GET /api/health](https://decodelabs-job-tracker.onrender.com/api/health)
+
+The website and API are hosted together on Render. Application records are stored in PostgreSQL on Neon. Free hosting may take a short time to wake up after inactivity. This is a shared demo; use sample applications.
 
 ## Features
 
@@ -31,6 +39,7 @@ Summary cards always describe the complete loaded dataset. Searching and filteri
 | Backend | Node.js, Express 5 |
 | Database | PostgreSQL with the `pg` connection pool |
 | Configuration | Environment variables loaded through `dotenv` |
+| Cloud hosting | Render web service and Neon PostgreSQL |
 | API checks | Postman and browser-based manual checks |
 | Version control | Git and GitHub |
 
@@ -173,11 +182,72 @@ The local version has been checked for:
 - A blocked application-list request displaying an error and Try again button.
 - Successful recovery after unblocking the request and selecting Try again.
 
-## Demo Scope and Deployment
+The deployed version was also verified on October 16, 2026:
+
+- The website, health endpoint, and application-list endpoint returned HTTP `200`.
+- The deployed server connected to the Neon database.
+- Browser checks covered creating an application and retaining it after refresh.
+- Editing the application's status, saving, and refreshing retained the change.
+- Combined company search and status filtering returned the matching record.
+- Deleting an application and refreshing confirmed its removal.
+
+## Cloud Deployment
+
+The current deployment uses one Render web service and a Neon PostgreSQL database in Frankfurt. The frontend uses relative API URLs, so it is served from the same origin as the backend.
+
+### 1. Prepare Neon
+
+Create a Neon project and database. In the Neon SQL Editor, select that database and execute the contents of [schema/database.sql](schema/database.sql). Creating a cloud database does not copy records from your local PostgreSQL server.
+
+Copy the host, database name, role, and password from Neon's connection details. The current setup uses a pooled host. This backend reads individual `PG*` variables; setting only `DATABASE_URL` does not configure its connection pool.
+
+### 2. Configure the Render web service
+
+Connect the repository and use the following settings:
+
+| Setting | Value |
+| --- | --- |
+| Repository | `majdharb123/decodelabs_tasks` |
+| Branch | `main` |
+| Runtime | Node |
+| Region | Frankfurt |
+| Root Directory | `project-4-job-tracker` |
+| Build Command | `npm ci` |
+| Start Command | `npm start` |
+| Health Check Path | `/api/health` |
+| Instance Type | Free, for this demo |
+| Auto-Deploy | On Commit |
+
+Add these environment variables in Render, replacing the placeholder values with your own connection details:
+
+| Variable | Value |
+| --- | --- |
+| `PGHOST` | Your Neon hostname, such as `your-endpoint-pooler.eu-central-1.aws.neon.tech` |
+| `PGPORT` | `5432` |
+| `PGDATABASE` | Your Neon database name, such as `neondb` |
+| `PGUSER` | Your Neon database role, such as `neondb_owner` |
+| `PGPASSWORD` | Your private Neon database password |
+| `PGSSLMODE` | `verify-full` |
+| `NODE_VERSION` | `22.x` |
+
+Enter values directly into Render's fields without surrounding quotation marks. Keep the database password in the hosting environment rather than in source control. Render supplies `PORT` automatically, and the server listens on `0.0.0.0` using that port.
+
+### 3. Deploy and verify
+
+Deploy the latest commit. The server checks both the database connection and the applications table before accepting HTTP requests. Successful startup includes:
+
+```text
+PostgreSQL connected: neondb
+Job Tracker API: http://localhost:10000
+```
+
+The database name and port in the log depend on your environment. Use the public HTTPS address assigned by Render to open the deployed website.
+
+Verify the health endpoint and the applications endpoint, then create, edit, and delete a sample application through the website. Refresh after each change to confirm cloud persistence.
+
+## Demo Scope
 
 This is a shared internship demo without authentication or user-specific data separation. Anyone who can access its API can change the shared records. Use sample applications in a public deployment.
-
-Cloud deployment to Neon and Render is the next phase. The cloud database configuration, schema import, and deployed CRUD operations must be verified before a live demo link is added here.
 
 ## Author
 

@@ -14,7 +14,7 @@ This repository contains the projects I developed during my **Full-Stack Develop
 | [Project 1: Task Manager](Project-1-Task-Manager/) | A responsive client-side task manager focused on frontend fundamentals and browser-based data persistence. | HTML, CSS, JavaScript, Local Storage | Completed |
 | [Project 2: Full-Stack Task Manager](Project-2-Full-Stack-Task-Manager/) | A deployed full-stack task management system with a RESTful CRUD API and PostgreSQL database. | HTML, CSS, JavaScript, Node.js, Express.js, PostgreSQL | Completed |
 | [Project 3: ExpenseFlow](Project-3-Full-Stack-Expense-Tracker/) | A deployed full-stack expense tracker with financial summaries, transaction management, categories, filters, and cloud data persistence. | HTML, CSS, JavaScript, Node.js, Express.js, PostgreSQL | Completed |
-| [Project 4: Job Application Tracker](project-4-job-tracker/) | A full-stack job application tracker with CRUD operations, status summaries, combined search and filtering, and API error recovery. | HTML, CSS, JavaScript, Node.js, Express.js, PostgreSQL | Implemented and tested locally; deployment pending |
+| [Project 4: Job Application Tracker](project-4-job-tracker/) | A deployed full-stack job application tracker with CRUD operations, status summaries, combined search and filtering, and API error recovery. | HTML, CSS, JavaScript, Node.js, Express.js, PostgreSQL | Completed and deployed |
 
 ## Project 1: Task Manager
 
@@ -124,10 +124,17 @@ The Job Application Tracker helps users organize job applications by company, ro
 
 ### Current Status
 
-The frontend, PostgreSQL CRUD API, and their integration have been implemented. Local checks cover CRUD operations, persistence, validation, combined search and filtering, the mobile layout, and recovery after a blocked API request. Cloud deployment is the next step; a live link will be added after verification.
+Deployed on Render with a PostgreSQL database hosted on Neon. The frontend and REST API run in one Express web service. Cloud verification on October 16, 2026 covered page loading, API responses, application creation, editing, deletion, persistence after refresh, and combined search and status filtering. Local checks also covered validation, the mobile layout, and recovery after a blocked API request.
 
+### Live Links
+
+- **Live Application:** [Job Application Tracker](https://decodelabs-job-tracker.onrender.com)
+- **REST API:** [Applications](https://decodelabs-job-tracker.onrender.com/api/applications)
+- **Health Check:** [Service Status](https://decodelabs-job-tracker.onrender.com/api/health)
 - **Documentation:** [Project 4 README](project-4-job-tracker/README.md)
 - **Source Code:** [Project 4 Folder](project-4-job-tracker/)
+
+> This is a shared demo; use sample applications. Free hosting may take a short time to wake up after inactivity.
 
 ## Repository Structure
 
